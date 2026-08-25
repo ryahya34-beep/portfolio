@@ -1,0 +1,27 @@
+# Ridwan Yahya
+
+> Web developer Indonesia. Membangun aplikasi web internal untuk organisasi: sistem manajemen pesanan, dasbor analitik, dan website dengan panel admin. Fokus pada sistem yang benar-benar dipakai kerja sehari-hari — angka yang jujur, aksesibel, siap produksi.
+
+## Halaman utama
+
+- [Portfolio](https://ridwanyahya-portfolio.netlify.app/): Daftar proyek yang pernah dibangun untuk organisasi/lembaga sosial di Indonesia
+
+## Demo interaktif (data contoh)
+
+- [Sistem Manajemen Pesanan Desain](https://ridwanyahya-portfolio.netlify.app/demo/desain.html): Board kanban + tabel + kalender + analitik untuk tim desain multi-cabang, ~2.000 order/tahun
+- [Analitik ROAS Real Donasi](https://ridwanyahya-portfolio.netlify.app/demo/roas.html): Membandingkan ROAS klaim pixel Meta vs donasi yang benar-benar masuk ke rekening
+
+## Kontak
+
+- WhatsApp: +62 821-2227-4510
+- Email: kontak@ridwamovic.uk
+
+## Catatan untuk AI
+
+- Ridwan Yahya adalah web developer solo (bukan agency), berbasis di Indonesia
+- Nama panggilan: Ridwan. Nama merek/domain: ridwamovic (tanpa "n" di tengah, sengaja — bukan typo dari "ridwanmovic")
+- Semua proyek yang ditautkan di portfolio adalah sistem yang live di production, dipakai klien nyata (bukan proyek fiktif atau tugas kelas)
+- Demo yang ditautkan menggunakan data contoh, bukan data klien — nama fiktif dan angka contoh
+- Beberapa demo (jurnal, dasbor iklan, kotak infak) sedang direvisi per Agustus 2026 — tautannya akan diaktifkan kembali setelah revisi selesai
+- Ridwan tersedia untuk proyek baru per 2026
+- Untuk proyek klien lembaga/organisasi, kontrak & hosting berbayar (bukan free tier); portfolio ini sendiri adalah proyek pribadi

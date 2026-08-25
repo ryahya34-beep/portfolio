@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200">
+  <!-- Full canvas background -->
+  <rect width="1200" height="1200" fill="#0f0f0d"/>
+
+  <!--
+    Safe crop zone (visible in final OG image): y = 285 to 915 (1200 x 630).
+    All content stays inside this band, with generous horizontal padding.
+  -->
+
+  <!-- status dot + label -->
+  <circle cx="130" cy="385" r="9" fill="#4ade80"/>
+  <text x="155" y="393" font-family="Menlo, 'Courier New', monospace" font-size="20" fill="#8f8d84" letter-spacing="2.5">TERBUKA UNTUK PROYEK BARU</text>
+
+  <!-- name -->
+  <text x="120" y="500" font-family="Georgia, 'Times New Roman', serif" font-size="64" fill="#e9e7e0">Ridwan Yahya</text>
+
+  <!-- headline (2 lines) -->
+  <text x="120" y="640" font-family="Georgia, 'Times New Roman', serif" font-size="70" fill="#e9e7e0">Web developer yang bikin sistem</text>
+  <text x="120" y="730" font-family="Georgia, 'Times New Roman', serif" font-size="70" fill="#e9e7e0"><tspan font-style="italic" fill="#e0b356">benar-benar dipakai</tspan> kerja.</text>
+
+  <!-- divider + footer -->
+  <line x1="120" y1="830" x2="1080" y2="830" stroke="#262622" stroke-width="1"/>
+  <text x="120" y="880" font-family="Menlo, 'Courier New', monospace" font-size="22" fill="#8f8d84" letter-spacing="2.5">RIDWAN.YAHYA · PORTFOLIO 2026</text>
+  <text x="1080" y="880" text-anchor="end" font-family="Menlo, 'Courier New', monospace" font-size="22" fill="#e0b356" letter-spacing="2.5">RIDWAMOVIC.UK</text>
+</svg>

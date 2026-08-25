@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>AdsMonitor — Demo Dasbor Iklan Meta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f0f0d; --surface:#161614; --line:#262622;
+    --text:#e9e7e0; --muted:#8f8d84; --accent:#e0b356;
+    --green:#4caf7d; --amber:#e0b356; --red:#d95f4b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'Inter',sans-serif; font-size:14px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+
+  /* top bar */
+  .topbar{border-bottom:1px solid var(--line);background:var(--bg)}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px}
+  .back{color:var(--muted);text-decoration:none;font-size:13px;white-space:nowrap}
+  .back:hover{color:var(--text)}
+  .pill{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent);border:1px solid var(--accent);border-radius:999px;
+    padding:4px 12px;white-space:nowrap;opacity:.9;
+  }
+
+  /* app header */
+  .apphead{padding:40px 0 24px}
+  .apphead .wrap{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .apphead h1{font-family:'Instrument Serif',serif;font-weight:400;font-size:34px;letter-spacing:.01em}
+  .apphead h1 span{color:var(--accent)}
+  .apphead .mono{color:var(--muted)}
+
+  /* KPI strip */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .kpi .mono{color:var(--muted);display:block;margin-bottom:8px}
+  .kpi .val{font-family:'Instrument Serif',serif;font-size:28px;line-height:1.1}
+  .kpi .val small{font-size:16px;color:var(--muted)}
+
+  /* alert */
+  .alert{
+    display:flex;gap:12px;align-items:flex-start;
+    background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--amber);
+    border-radius:12px;padding:14px 18px;margin-bottom:20px;color:var(--text);
+  }
+  .alert .dot{width:9px;height:9px;border-radius:50%;background:var(--amber);margin-top:6px;flex:none}
+
+  /* table card */
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:20px;overflow:hidden}
+  .card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+  .card-head h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:19px}
+  .card-head .mono{color:var(--muted)}
+  .table-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:680px}
+  th,td{padding:13px 20px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:rgba(255,255,255,.02)}
+  td.num{font-variant-numeric:tabular-nums}
+  .trend{font-family:'IBM Plex Mono',monospace;font-size:11px;margin-left:6px}
+  .trend.down{color:var(--red)} .trend.flat{color:var(--muted)}
+
+  .badge{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+  .badge i{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+  .b-sehat i{background:var(--green)}
+  .b-waspada i{background:var(--amber)}
+  .b-lelah i{background:var(--red)}
+
+  /* chart */
+  .chart-card{padding:20px}
+  .chart-card h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:19px;margin-bottom:4px}
+  .chart-card .sub{color:var(--muted);font-size:12.5px;margin-bottom:16px}
+  .chart-box{position:relative;height:280px}
+
+  footer{padding:28px 0 40px;text-align:center}
+  footer .note{color:var(--muted);font-size:12.5px;max-width:560px;margin:0 auto 14px}
+  footer .tiny{color:var(--muted);font-size:11px;opacity:.75}
+
+  @media(max-width:760px){
+    .kpis{grid-template-columns:1fr 1fr}
+    .apphead{padding:30px 0 20px}
+    .apphead h1{font-size:27px}
+    .kpi .val{font-size:22px}
+    .chart-box{height:220px}
+  }
+  @media(max-width:420px){
+    .topbar .wrap{flex-wrap:wrap;height:auto;padding-top:10px;padding-bottom:10px;justify-content:center}
+    .kpis{grid-template-columns:1fr 1fr;gap:10px}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="../index.html">← Portfolio Ridwan Yahya</a>
+    <span class="pill">Demo — data contoh, bukan data klien</span>
+  </div>
+</div>
+
+<header class="apphead">
+  <div class="wrap">
+    <h1>Ads<span>Monitor</span></h1>
+    <span class="mono">Data per 16 Agu 2026 · ditarik live dari API</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="kpis">
+    <div class="kpi"><span class="mono">Belanja 30 hari</span><div class="val">Rp 84,2 <small>jt</small></div></div>
+    <div class="kpi"><span class="mono">Iklan aktif</span><div class="val">57</div></div>
+    <div class="kpi"><span class="mono">Rata-rata CTR</span><div class="val">1,8<small>%</small></div></div>
+    <div class="kpi"><span class="mono">Frekuensi rata-rata</span><div class="val">2,3</div></div>
+  </section>
+
+  <div class="alert">
+    <span class="dot"></span>
+    <span><strong>3 iklan menunjukkan tanda kelelahan (creative fatigue)</strong> — siapkan materi pengganti sebelum performa turun.</span>
+  </div>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Performa iklan</h2>
+      <span class="mono">8 iklan dipantau</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Iklan</th><th>Belanja 7h</th><th>CTR</th><th>Frekuensi</th><th>CPM</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Video Testimoni 15s</td><td class="num">Rp 3.412.000</td><td class="num">0,9%<span class="trend down">↓</span></td><td class="num">3,8</td><td class="num">Rp 41.200</td><td><span class="badge b-lelah"><i></i>Lelah</span></td></tr>
+          <tr><td>Carousel Program Air</td><td class="num">Rp 2.876.000</td><td class="num">2,1%<span class="trend flat">→</span></td><td class="num">1,9</td><td class="num">Rp 33.500</td><td><span class="badge b-sehat"><i></i>Sehat</span></td></tr>
+          <tr><td>Static Quote Jumat</td><td class="num">Rp 1.204.000</td><td class="num">1,2%<span class="trend down">↓</span></td><td class="num">2,9</td><td class="num">Rp 28.900</td><td><span class="badge b-waspada"><i></i>Waspada</span></td></tr>
+          <tr><td>Video Daurah 30s</td><td class="num">Rp 2.105.000</td><td class="num">2,4%<span class="trend flat">→</span></td><td class="num">1,6</td><td class="num">Rp 36.700</td><td><span class="badge b-sehat"><i></i>Sehat</span></td></tr>
+          <tr><td>Story Ads Wakaf</td><td class="num">Rp 1.689.000</td><td class="num">1,7%<span class="trend down">↓</span></td><td class="num">2,7</td><td class="num">Rp 31.800</td><td><span class="badge b-waspada"><i></i>Waspada</span></td></tr>
+          <tr><td>Kolase Donatur</td><td class="num">Rp 987.000</td><td class="num">1,0%<span class="trend down">↓</span></td><td class="num">3,5</td><td class="num">Rp 27.400</td><td><span class="badge b-lelah"><i></i>Lelah</span></td></tr>
+          <tr><td>Video Update Proyek</td><td class="num">Rp 2.431.000</td><td class="num">2,6%<span class="trend flat">→</span></td><td class="num">1,4</td><td class="num">Rp 39.100</td><td><span class="badge b-sehat"><i></i>Sehat</span></td></tr>
+          <tr><td>Static Promo Ramadan</td><td class="num">Rp 1.540.000</td><td class="num">0,8%<span class="trend down">↓</span></td><td class="num">4,1</td><td class="num">Rp 25.600</td><td><span class="badge b-lelah"><i></i>Lelah</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card chart-card">
+    <h2>CTR 14 hari — Video Testimoni 15s (lelah)</h2>
+    <div class="sub">Persentase klik-tayang harian. Tren menurun sejak hari ke-6 — sinyal awal creative fatigue.</div>
+    <div class="chart-box"><canvas id="ctrChart"></canvas></div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="note">Di production, seluruh angka ditarik langsung dari Meta API setiap halaman dibuka — tanpa database, tanpa rekap manual.</p>
+    <p class="tiny">Demo statis dengan data contoh · Sistem aslinya live dan dipakai klien di production</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const labels = ['3 Agu','4 Agu','5 Agu','6 Agu','7 Agu','8 Agu','9 Agu','10 Agu','11 Agu','12 Agu','13 Agu','14 Agu','15 Agu','16 Agu'];
+  const data = [2.4, 2.3, 2.4, 2.2, 2.0, 1.8, 1.7, 1.5, 1.4, 1.2, 1.1, 1.0, 0.9, 0.9];
+  const ctx = document.getElementById('ctrChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'CTR (%)',
+        data,
+        borderColor: '#e0b356',
+        backgroundColor: '#e0b356',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        pointBackgroundColor: '#e0b356',
+        pointBorderColor: '#0f0f0d',
+        tension: 0.3,
+        fill: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#161614',
+          borderColor: '#262622',
+          borderWidth: 1,
+          titleColor: '#e9e7e0',
+          bodyColor: '#e9e7e0',
+          padding: 10,
+          displayColors: false,
+          callbacks: {
+            label: (c) => 'CTR ' + c.parsed.y.toLocaleString('id-ID') + '%'
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(143,141,132,0.12)' },
+          ticks: { color: '#8f8d84', font: { family: "'IBM Plex Mono', monospace", size: 10 } },
+          border: { color: '#262622' }
+        },
+        y: {
+          min: 0, max: 2.6,
+          grid: { color: 'rgba(143,141,132,0.12)' },
+          ticks: {
+            color: '#8f8d84',
+            font: { family: "'IBM Plex Mono', monospace", size: 10 },
+            callback: (v) => v.toLocaleString('id-ID') + '%'
+          },
+          border: { color: '#262622' }
+        }
+      }
+    }
+  });
+</script>
+</body>
+</html>

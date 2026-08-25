@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ridwan Yahya — Web Developer</title>
+<meta name="description" content="Saya bikin aplikasi web yang benar-benar dipakai kerja: dashboard, sistem internal, dan website untuk organisasi.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ridwan Yahya — Web Developer">
+<meta property="og:description" content="Web developer yang bikin sistem benar-benar dipakai kerja: dashboard, sistem internal, dan website untuk organisasi.">
+<meta property="og:image" content="https://ridwanyahya-portfolio.netlify.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://ridwanyahya-portfolio.netlify.app/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:site_name" content="Ridwan Yahya">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ridwan Yahya — Web Developer">
+<meta name="twitter:description" content="Web developer yang bikin sistem benar-benar dipakai kerja.">
+<meta name="twitter:image" content="https://ridwanyahya-portfolio.netlify.app/og-image.png">
+
+<!-- JSON-LD Person schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Ridwan Yahya",
+  "url": "https://ridwanyahya-portfolio.netlify.app/",
+  "jobTitle": "Web Developer",
+  "description": "Web developer Indonesia yang membangun aplikasi web internal untuk organisasi: sistem manajemen pesanan, dasbor analitik, dan website dengan panel admin.",
+  "email": "kontak@ridwamovic.uk",
+  "nationality": "Indonesian"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f0f0d;
+    --surface:#161614;
+    --line:#262622;
+    --text:#e9e7e0;
+    --muted:#8f8d84;
+    --accent:#e0b356;
+    --accent-dim:rgba(224,179,86,.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent);color:#0f0f0d}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  .mono{font-family:'IBM Plex Mono',monospace;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .serif{font-family:'Instrument Serif',serif;font-weight:400}
+  a{color:inherit}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky;top:0;z-index:10;
+    background:rgba(15,15,13,.85);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex;justify-content:space-between;align-items:center;height:60px}
+  .brand{font-family:'IBM Plex Mono',monospace;font-size:.85rem;letter-spacing:.05em}
+  .brand span{color:var(--accent)}
+  .nav-cta{
+    font-size:.85rem;font-weight:500;text-decoration:none;
+    border:1px solid var(--line);border-radius:99px;
+    padding:.45rem 1.1rem;transition:border-color .2s,color .2s;
+  }
+  .nav-cta:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:7rem 0 5rem}
+  .hero .mono{display:flex;align-items:center;gap:.6rem;margin-bottom:1.6rem}
+  .dot{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px rgba(74,222,128,.6)}
+  h1{
+    font-family:'Instrument Serif',serif;font-weight:400;
+    font-size:clamp(2.6rem,6.2vw,4.6rem);
+    line-height:1.08;letter-spacing:-.01em;
+    max-width:16ch;
+  }
+  h1 em{font-style:italic;color:var(--accent)}
+  .hero-sub{
+    margin-top:1.8rem;max-width:52ch;color:var(--muted);font-size:1.06rem;
+  }
+  .hero-sub b{color:var(--text);font-weight:500}
+  .hero-actions{margin-top:2.6rem;display:flex;gap:.9rem;flex-wrap:wrap}
+  .btn{
+    display:inline-flex;align-items:center;gap:.5rem;
+    text-decoration:none;font-weight:500;font-size:.92rem;
+    padding:.75rem 1.5rem;border-radius:99px;
+    transition:transform .15s,background .2s,border-color .2s;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn-primary{background:var(--accent);color:#141310}
+  .btn-primary:hover{background:#edca76}
+  .btn-ghost{border:1px solid var(--line);color:var(--text)}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* ---------- STATS ---------- */
+  .stats{
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    display:grid;grid-template-columns:repeat(4,1fr);
+  }
+  .stat{padding:1.6rem 1.2rem;border-left:1px solid var(--line)}
+  .stat:first-child{border-left:none}
+  .stat .num{font-family:'Instrument Serif',serif;font-size:2rem;color:var(--text)}
+  .stat .lbl{font-size:.8rem;color:var(--muted);margin-top:.2rem}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:5rem 0}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1rem;gap:1rem;flex-wrap:wrap}
+  h2{font-family:'Instrument Serif',serif;font-weight:400;font-size:clamp(1.7rem,3.4vw,2.4rem);letter-spacing:-.01em}
+  h2 em{font-style:italic;color:var(--accent)}
+  .sec-note{
+    font-size:.85rem;color:var(--muted);max-width:60ch;
+    margin-bottom:2.4rem;padding-left:.9rem;border-left:2px solid var(--accent);
+  }
+
+  /* ---------- PROJECT LIST ---------- */
+  .project{border-top:1px solid var(--line)}
+  .project:last-child{border-bottom:1px solid var(--line)}
+  .p-row{
+    display:grid;grid-template-columns:3.2rem 1fr auto;gap:1.2rem;align-items:baseline;
+    padding:1.6rem .4rem;cursor:pointer;
+    transition:background .2s;
+    /* button reset */
+    background:transparent;border:0;color:inherit;font:inherit;
+    text-align:left;width:100%;
+  }
+  .p-row:hover{background:var(--surface)}
+  .p-row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;background:var(--surface)}
+  .p-num{font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--muted)}
+  .p-title{font-family:'Instrument Serif',serif;font-size:clamp(1.3rem,2.6vw,1.8rem);line-height:1.2}
+  .p-tag{font-size:.85rem;color:var(--muted);margin-top:.25rem}
+  .p-arrow{
+    font-size:1.1rem;color:var(--muted);transition:transform .25s,color .2s;
+    align-self:center;
+  }
+  .project.open .p-arrow{transform:rotate(45deg);color:var(--accent)}
+  .p-detail{
+    max-height:0;overflow:hidden;
+    transition:max-height .35s ease;
+  }
+  .project.open .p-detail{max-height:600px}
+  .p-detail-inner{
+    display:grid;grid-template-columns:3.2rem 1fr;gap:1.2rem;
+    padding:0 .4rem 1.8rem;
+  }
+  .p-body{max-width:60ch}
+  .p-body p{color:#c9c7be;font-size:.95rem}
+  .p-body p+p{margin-top:.7rem}
+  .p-metric{
+    display:inline-block;margin-top:.9rem;
+    background:var(--accent-dim);color:var(--accent);
+    font-family:'IBM Plex Mono',monospace;font-size:.75rem;letter-spacing:.04em;
+    padding:.3rem .8rem;border-radius:99px;
+  }
+  .p-meta{margin-top:1.1rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+  .stack{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--muted)}
+  .p-link{
+    font-size:.85rem;font-weight:500;color:var(--accent);text-decoration:none;
+    border-bottom:1px solid transparent;transition:border-color .2s;
+  }
+  .p-link:hover{border-color:var(--accent)}
+  .p-link-soon{
+    font-size:.8rem;font-weight:500;color:var(--muted);font-style:italic;
+    display:inline-flex;align-items:center;gap:.5rem;
+  }
+  .p-link-soon::before{
+    content:"";width:6px;height:6px;border-radius:50%;background:var(--muted);
+  }
+
+  /* ---------- PRINSIP ---------- */
+  .prinsip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .prinsip{background:var(--bg);padding:1.8rem 1.5rem}
+  .prinsip .mono{color:var(--accent);display:block;margin-bottom:.9rem}
+  .prinsip h3{font-size:1.05rem;font-weight:600;margin-bottom:.5rem}
+  .prinsip p{font-size:.88rem;color:var(--muted)}
+
+  /* ---------- CTA ---------- */
+  .cta{
+    text-align:center;padding:6rem 0 7rem;
+    border-top:1px solid var(--line);
+  }
+  .cta h2{font-size:clamp(2rem,4.6vw,3.2rem);max-width:20ch;margin:0 auto}
+  .cta p{color:var(--muted);margin:1.4rem auto 2.4rem;max-width:46ch}
+  footer{
+    border-top:1px solid var(--line);
+    padding:1.6rem 0;font-size:.8rem;color:var(--muted);
+  }
+  footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+
+  /* ---------- REVEAL ---------- */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none}
+    html{scroll-behavior:auto}
+  }
+
+  /* ---------- MOBILE ---------- */
+  @media (max-width:760px){
+    .hero{padding:4.5rem 0 3.5rem}
+    .stats{grid-template-columns:1fr 1fr}
+    .stat:nth-child(3){border-left:none}
+    .stat{border-top:1px solid var(--line)}
+    .stat:nth-child(-n+2){border-top:none}
+    .prinsip-grid{grid-template-columns:1fr}
+    .p-row{grid-template-columns:2.4rem 1fr auto;gap:.8rem}
+    .p-detail-inner{grid-template-columns:1fr;padding-left:0}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">ridwan<span>.</span>yahya</div>
+    <a class="nav-cta" href="#kontak">Hubungi saya</a>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <p class="mono"><span class="dot" aria-hidden="true"></span> Terbuka untuk proyek baru</p>
+  <h1>Saya bikin aplikasi web yang <em>benar-benar dipakai</em> kerja.</h1>
+  <p class="hero-sub">
+    Ridwan Yahya — web developer. Saya membantu organisasi mengubah proses yang
+    ribet (Excel berserakan, rekap manual, data yang tak bisa dipercaya) menjadi
+    <b>sistem yang rapi, jujur, dan dipakai tim setiap hari.</b>
+  </p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="#karya">Lihat karya →</a>
+    <a class="btn btn-ghost" href="#kontak">Ceritakan kebutuhan Anda</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="stats reveal">
+    <div class="stat"><div class="num">5</div><div class="lbl">Proyek live di production</div></div>
+    <div class="stat"><div class="num">±2.000</div><div class="lbl">Order/tahun dikelola sistem buatan saya</div></div>
+    <div class="stat"><div class="num">26+</div><div class="lbl">Akun iklan dipantau satu dasbor</div></div>
+    <div class="stat"><div class="num">4</div><div class="lbl">Wilayah operasional satu aplikasi</div></div>
+  </div>
+</div>
+
+<section id="karya" class="wrap">
+  <div class="sec-head">
+    <h2>Karya <em>pilihan</em></h2>
+    <span class="mono">Semuanya live &amp; dipakai nyata</span>
+  </div>
+  <p class="sec-note">
+    Situs asli milik klien dan berisi data internal — sengaja tidak ditautkan demi
+    privasi. Sebagai gantinya, tiap proyek punya <b>demo interaktif dengan data
+    contoh</b> yang menunjukkan sistem yang sama persis.
+  </p>
+
+  <div class="project reveal">
+    <button class="p-row" type="button" onclick="toggle(this)" aria-expanded="false">
+      <span class="p-num">01</span>
+      <span>
+        <span class="p-title" style="display:block">Sistem Manajemen Pesanan Desain</span>
+        <span class="p-tag" style="display:block">Tool internal tim marketing &amp; komunikasi lembaga sosial — skala nasional</span>
+      </span>
+      <span class="p-arrow" aria-hidden="true">+</span>
+    </button>
+    <div class="p-detail"><div class="p-detail-inner"><span></span><div class="p-body">
+      <p>Tim desain menerima ribuan pesanan (banner, video, konten sosmed) dari cabang
+      se-Indonesia. Saya bangun sistem kanban realtime: tiap pesanan punya brief, arsip aset,
+      komentar, notifikasi, dan penugasan yang jelas — menggantikan koordinasi lewat chat
+      yang sering kehilangan jejak.</p>
+      <p>Setiap aksi penting tercatat lewat audit trail di level database, jadi riwayat
+      tidak bisa dipalsukan atau dihapus diam-diam.</p>
+      <span class="p-metric">±2.000 order/tahun · multi-cabang nasional</span>
+      <div class="p-meta">
+        <span class="stack">Next.js · Supabase · Tailwind · Realtime</span>
+        <a class="p-link" href="demo/desain.html">Lihat demo →</a>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="project reveal">
+    <button class="p-row" type="button" onclick="toggle(this)" aria-expanded="false">
+      <span class="p-num">02</span>
+      <span>
+        <span class="p-title" style="display:block">Dasbor Monitoring Iklan Meta</span>
+        <span class="p-tag" style="display:block">Pemantauan performa iklan donasi di Facebook &amp; Instagram</span>
+      </span>
+      <span class="p-arrow" aria-hidden="true">+</span>
+    </button>
+    <div class="p-detail"><div class="p-detail-inner"><span></span><div class="p-body">
+      <p>Akun iklan tersebar di banyak Business Manager dan mustahil dipantau satu per satu.
+      Dasbor ini menarik data langsung dari Meta API setiap dibuka — tanpa database, tanpa
+      rekap manual — dan menyoroti iklan yang mulai "lelah" <em>sebelum</em> performanya benar-benar turun.</p>
+      <p>Tim jadi punya waktu menyiapkan materi pengganti, bukan panik setelah angka jatuh.</p>
+      <span class="p-metric">26+ akun iklan · data live tiap dibuka</span>
+      <div class="p-meta">
+        <span class="stack">Next.js · TypeScript · Meta Graph API</span>
+        <span class="p-link-soon">Demo sedang direvisi</span>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="project reveal">
+    <button class="p-row" type="button" onclick="toggle(this)" aria-expanded="false">
+      <span class="p-num">03</span>
+      <span>
+        <span class="p-title" style="display:block">Laporan Iklan &amp; ROAS Donasi Real</span>
+        <span class="p-tag" style="display:block">Analitik kampanye donasi — memisahkan klaim iklan dari uang nyata</span>
+      </span>
+      <span class="p-arrow" aria-hidden="true">+</span>
+    </button>
+    <div class="p-detail"><div class="p-detail-inner"><span></span><div class="p-body">
+      <p>Pixel Meta selalu mengklaim hasil lebih besar dari kenyataan. Aplikasi ini menerima
+      file laporan iklan + data donasi, lalu menghitung dua angka berdampingan: ROAS versi
+      Meta dan ROAS dari donasi yang <em>benar-benar masuk</em>.</p>
+      <p>Keputusan naik/turun budget jadi berdasar uang nyata, bukan klaim platform.
+      Laporan tersimpan di server sehingga atasan bisa buka dari perangkat sendiri.</p>
+      <span class="p-metric">Dual ROAS · analitik campaign donasi</span>
+      <div class="p-meta">
+        <span class="stack">Vanilla JS · Supabase · Chart.js</span>
+        <a class="p-link" href="demo/roas.html">Lihat demo →</a>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="project reveal">
+    <button class="p-row" type="button" onclick="toggle(this)" aria-expanded="false">
+      <span class="p-num">04</span>
+      <span>
+        <span class="p-title" style="display:block">Kotak Infak</span>
+        <span class="p-tag" style="display:block">Aplikasi lapangan untuk pengelolaan kotak infak — 4 wilayah</span>
+      </span>
+      <span class="p-arrow" aria-hidden="true">+</span>
+    </button>
+    <div class="p-detail"><div class="p-detail-inner"><span></span><div class="p-body">
+      <p>Ratusan titik kotak infak tersebar di masjid, warung, dan toko. Aplikasi mobile-first
+      ini mencatat lokasi, jadwal penarikan, dan nominal donasi — plus peringatan otomatis
+      untuk kotak yang terlambat ditarik.</p>
+      <p>Laporan bisa diekspor ke Excel/PDF, dan petugas lapangan cukup pakai HP.</p>
+      <span class="p-metric">4 wilayah · mobile-first · export Excel/PDF</span>
+      <div class="p-meta">
+        <span class="stack">Vanilla JS · Supabase · Vercel</span>
+        <span class="p-link-soon">Demo sedang direvisi</span>
+      </div>
+    </div></div></div>
+  </div>
+
+  <div class="project reveal">
+    <button class="p-row" type="button" onclick="toggle(this)" aria-expanded="false">
+      <span class="p-num">05</span>
+      <span>
+        <span class="p-title" style="display:block">Website Jurnal &amp; Tulisan Ilmiah</span>
+        <span class="p-tag" style="display:block">Website personal peneliti — terindeks Google Scholar</span>
+      </span>
+      <span class="p-arrow" aria-hidden="true">+</span>
+    </button>
+    <div class="p-detail"><div class="p-detail-inner"><span></span><div class="p-body">
+      <p>Website untuk seorang peneliti: publikasi jurnal dengan metadata akademik yang benar
+      (terindeks Google Scholar), artikel, dan halaman profil — semuanya dikelola sendiri
+      oleh klien lewat panel admin, tanpa perlu menyentuh kode.</p>
+      <p>SEO teknis dikerjakan serius: sitemap, canonical, dan struktur yang membuat tulisan
+      mudah ditemukan lewat Google.</p>
+      <span class="p-metric">Domain custom · CMS admin · SEO teknis</span>
+      <div class="p-meta">
+        <span class="stack">Next.js · Supabase · Tailwind · Netlify</span>
+        <span class="p-link-soon">Demo sedang direvisi</span>
+      </div>
+    </div></div></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head">
+    <h2>Yang saya jaga di <em>tiap proyek</em></h2>
+  </div>
+  <div class="prinsip-grid reveal">
+    <div class="prinsip">
+      <span class="mono">01</span>
+      <h3>Angka yang jujur</h3>
+      <p>Data yang tampil di layar harus bisa dipertanggungjawabkan. Kalau ada dua versi
+      kebenaran (klaim platform vs uang nyata), saya tampilkan dua-duanya — bukan yang
+      kelihatan bagus saja.</p>
+    </div>
+    <div class="prinsip">
+      <span class="mono">02</span>
+      <h3>Sederhana dipakai</h3>
+      <p>Pengguna sistem saya bukan orang IT. Kalau butuh training panjang untuk memakainya,
+      berarti desainnya gagal. Sistem yang baik terasa jelas sejak dibuka pertama kali.</p>
+    </div>
+    <div class="prinsip">
+      <span class="mono">03</span>
+      <h3>Siap produksi, bukan demo</h3>
+      <p>Keamanan akses, backup data, dan jejak audit dikerjakan sejak awal — bukan
+      ditambal setelah kejadian. Semua proyek di atas live dan dipakai kerja nyata.</p>
+    </div>
+  </div>
+</section>
+
+<section id="kontak" class="cta">
+  <div class="wrap reveal">
+    <p class="mono">Kontak</p>
+    <h2>Punya proses kerja yang masih <em>ribet?</em></h2>
+    <p>Ceritakan saja masalahnya — rekap manual, data berserakan, atau laporan yang
+    tak bisa dipercaya. Saya bantu ubah jadi sistem yang rapi.</p>
+    <div class="hero-actions" style="justify-content:center">
+      <a class="btn btn-primary" href="https://wa.me/6282122274510?text=Halo%20Ridwan%2C%20saya%20lihat%20portfolio%20Anda%20dan%20ingin%20diskusi%20proyek." target="_blank" rel="noopener">Chat WhatsApp →</a>
+      <a class="btn btn-ghost" href="mailto:kontak@ridwamovic.uk">kontak@ridwamovic.uk</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Ridwan Yahya</span>
+    <span>Dibuat sendiri — tentu saja.</span>
+  </div>
+</footer>
+
+<script>
+  function toggle(btn){
+    const project = btn.parentElement;
+    const isOpen = project.classList.toggle('open');
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+
+  // Buka proyek pertama sebagai contoh (dan sinkronkan aria-expanded)
+  (function openFirst(){
+    const firstProject = document.querySelector('.project');
+    if(!firstProject) return;
+    firstProject.classList.add('open');
+    const btn = firstProject.querySelector('.p-row');
+    if(btn) btn.setAttribute('aria-expanded', 'true');
+  })();
+
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+
+</body>
+</html>

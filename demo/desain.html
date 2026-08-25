@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>StudioOrder — Demo Manajemen Pesanan Desain</title>
+<script>
+  // Tema tersimpan (pola sama dengan layout.tsx asli).
+  try{var t=localStorage.getItem('theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}
+</script>
+<style>
+  /* Token warna & radius — disalin dari globals.css aplikasi asli (light + dark) */
+  :root{
+    --r-sm:6px; --r-md:10px; --r-lg:14px; --r-full:50px;
+    --t-fast:0.12s ease;
+  }
+  :root,[data-theme="light"]{
+    color-scheme:light;
+    --bg:#F7F7F4; --surface:#ffffff; --surface-2:#F0F0EC; --surface-3:#FCFCFA;
+    --text:#1A1A17; --text-2:#3A3A35; --text-3:#55554E;
+    --muted:#9A9A92; --muted-2:#A8A8A0; --muted-3:#B5B5AD;
+    --border:#EAEAE5; --border-2:#E5E5E0;
+    --accent:#1B7A5A; --accent-2:#1B6E50; --accent-soft:#E9F2EC; --accent-soft-border:#C8E3CC;
+    --danger:#C0392B; --danger-soft:#FBEAEA;
+    --info:#378ADD; --info-dark:#0C447C; --info-soft:#E6F1FB;
+    --warning:#EF9F27; --warning-dark:#854F0B; --warning-soft:#FAEEDA;
+    --violet:#8B5BC0; --violet-dark:#5B3B8F; --violet-soft:#F0EAFB;
+    --card-hover-border:#D8D8D2; --card-hover-shadow:rgba(0,0,0,0.10);
+  }
+  [data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#16161A; --surface:#1E1E24; --surface-2:#26262E; --surface-3:#1A1A20;
+    --text:#ECECE8; --text-2:#D5D5D0; --text-3:#B0B0AA;
+    --muted:#8A8A84; --muted-2:#7E7E78; --muted-3:#6E6E68;
+    --border:#32323A; --border-2:#3A3A44;
+    --accent:#2E9B74; --accent-2:#35A87E; --accent-soft:#1B3A2E; --accent-soft-border:#2A5444;
+    --danger:#E05A4D; --danger-soft:#3A2020;
+    --info:#5AA0E5; --info-dark:#A8CBF0; --info-soft:#1C2A3A;
+    --warning:#F0B04D; --warning-dark:#F0C988; --warning-soft:#3A2E1A;
+    --violet:#A78BDC; --violet-dark:#CDBBEC; --violet-soft:#241B36;
+    --card-hover-border:#44444E; --card-hover-shadow:rgba(0,0,0,0.4);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;
+    min-height:100vh;display:flex;flex-direction:column;
+  }
+  button{transition:filter .12s ease,transform .08s ease,opacity .12s ease;font-family:inherit}
+  button:hover:not(:disabled){filter:brightness(.94)}
+  button:active:not(:disabled){transform:scale(.97)}
+  input,select,textarea{transition:border-color var(--t-fast),box-shadow var(--t-fast);font-family:inherit}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 3px var(--accent-soft)}
+  a{color:var(--accent-2)}
+
+  /* ---------- Top bar portfolio (chrome demo, palette portfolio — fixed) ---------- */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;gap:10px 12px;flex-wrap:wrap;
+    padding:10px 24px;background:#0f0f0d;border-bottom:1px solid #262622;
+  }
+  .backlink{color:#8f8d84;text-decoration:none;font-size:13px;font-weight:500;white-space:nowrap;transition:color .15s ease}
+  .backlink:hover{color:#e0b356}
+  .demo-pill{
+    font-family:Menlo,Monaco,'Courier New',monospace;
+    font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:#e0b356;background:transparent;
+    border:1px solid rgba(224,179,86,.35);border-radius:999px;
+    padding:5px 12px;white-space:nowrap;
+  }
+
+  /* ---------- Layout app ---------- */
+  .app{display:flex;flex:1;min-height:0}
+
+  /* ---------- Sidebar ---------- */
+  .app-sidebar{
+    width:210px;flex-shrink:0;background:var(--surface-3);border-right:1px solid var(--border);
+    padding:20px 16px;display:flex;flex-direction:column;
+    height:calc(100vh - 42px);position:sticky;top:0;align-self:flex-start;
+  }
+  .app-brand{display:flex;align-items:center;gap:8px;padding:0 8px 24px;cursor:pointer}
+  .brand-mark{
+    width:24px;height:24px;min-width:24px;border-radius:7px;background:var(--accent);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;flex-shrink:0;
+  }
+  .app-brand-text{font-weight:600;font-size:15px;color:var(--text);letter-spacing:-0.01em}
+  .app-sidebar nav{display:flex;flex-direction:column;gap:4px}
+  .nav-row{
+    display:flex;align-items:center;gap:8px;padding:8px;font-size:13px;font-weight:500;
+    border-radius:var(--r-md);text-decoration:none;color:var(--text-3);
+    transition:background var(--t-fast),color var(--t-fast);cursor:pointer;
+  }
+  .nav-row:not(.nav-on):hover{background:var(--surface-2)}
+  .nav-row.nav-on{background:var(--accent-soft);color:var(--accent-2);font-weight:600}
+  .nav-row .nav-icon{display:flex;color:var(--muted)}
+  .nav-row.nav-on .nav-icon{color:var(--accent)}
+  .nav-label{flex:1}
+  .nav-badge{
+    font-size:11px;font-weight:600;color:var(--muted-3);background:var(--border);
+    border-radius:var(--r-md);padding:2px 8px;min-width:18px;text-align:center;
+  }
+  .nav-on .nav-badge{color:var(--accent-2);background:var(--surface)}
+  .profile-btn{
+    display:flex;align-items:center;gap:8px;width:100%;padding:8px;border:none;background:none;
+    border-radius:var(--r-md);cursor:pointer;text-align:left;color:inherit;
+    transition:background var(--t-fast);
+  }
+  .profile-btn:hover{background:var(--surface-2)}
+  .profile-text{flex:1;min-width:0}
+  .profile-text .p-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .profile-text .p-role{font-size:11px;color:var(--muted-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ---------- Header halaman ---------- */
+  main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .app-header{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:16px 24px;border-bottom:1px solid var(--border);background:var(--surface);
+  }
+  .app-header h1{font-size:19px;font-weight:600;color:var(--text);letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .app-header .subtitle{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap}
+  .app-header-actions{display:flex;align-items:center;gap:12px;flex-shrink:0}
+  .btn-new-order{
+    padding:8px 16px;font-size:13px;font-weight:500;background:var(--accent);color:#fff;
+    border:none;border-radius:var(--r-md);cursor:pointer;white-space:nowrap;
+  }
+  .icon-btn{
+    width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;
+    border:1px solid var(--border-2);border-radius:var(--r-md);background:var(--surface);
+    color:var(--text-3);cursor:pointer;position:relative;
+  }
+  .btn-theme{
+    width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);
+    cursor:pointer;color:var(--text-3);
+  }
+  .nav-btn{
+    padding:8px 12px;font-size:15px;background:var(--surface);color:var(--text-2);
+    border:1px solid var(--border-2);border-radius:var(--r-md);text-decoration:none;
+    line-height:1;display:inline-flex;align-items:center;cursor:pointer;
+  }
+
+  /* ---------- Bell notifikasi ---------- */
+  .bell-badge{
+    position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;padding:0 4px;
+    font-size:11px;font-weight:700;color:#fff;background:var(--danger);border-radius:var(--r-md);
+    display:flex;align-items:center;justify-content:center;line-height:1;
+  }
+  .bell-panel{
+    position:absolute;top:44px;right:0;width:300px;background:var(--surface);
+    border:1px solid var(--border);border-radius:var(--r-lg);
+    box-shadow:0 8px 28px rgba(0,0,0,0.10);z-index:150;overflow:hidden;
+  }
+  .notif-item{
+    display:block;width:100%;text-align:left;padding:12px 16px;border:none;
+    border-bottom:1px solid var(--surface-2);cursor:pointer;background:var(--surface);color:inherit;
+  }
+  .notif-item:hover{background:var(--surface-2)}
+  .notif-item.unread{background:var(--accent-soft)}
+
+  /* ---------- Filter bar (board) ---------- */
+  .filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:16px 24px 0}
+  .view-toggle{
+    display:inline-flex;background:var(--surface-2);border:1px solid var(--border-2);
+    border-radius:var(--r-md);padding:2px;height:36px;flex-shrink:0;
+  }
+  .view-toggle button{
+    display:inline-flex;align-items:center;gap:5px;padding:0 10px;font-size:12.5px;font-weight:600;
+    border:none;border-radius:var(--r-sm);cursor:pointer;background:transparent;color:var(--muted-3);
+  }
+  .view-toggle button.on{background:var(--surface);color:var(--accent-2);box-shadow:0 1px 2px rgba(0,0,0,0.06)}
+  .filter-search{
+    height:36px;padding:0 12px;font-size:13px;border:1px solid var(--border-2);border-radius:var(--r-md);
+    color:var(--text);background:var(--surface);outline:none;min-width:180px;
+  }
+  .iconfilter-btn{
+    position:relative;width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;
+    border:1px solid var(--border-2);border-radius:var(--r-md);background:var(--surface);
+    color:var(--text-2);cursor:pointer;
+  }
+  .iconfilter-btn.active{border-color:var(--accent);color:var(--accent)}
+  .iconfilter-btn .fdot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+  .btn-reset{
+    height:36px;padding:0 12px;font-size:12px;font-weight:500;background:var(--surface);
+    color:var(--muted-3);border:1px solid var(--border-2);border-radius:var(--r-md);cursor:pointer;
+  }
+
+  /* ---------- Popup (pola IconFilter/EditPop asli) ---------- */
+  .pop{
+    position:fixed;z-index:300;min-width:180px;max-height:320px;overflow-y:auto;
+    background:var(--surface);border:1px solid var(--border-2);border-radius:var(--r-md);
+    box-shadow:0 10px 30px rgba(0,0,0,0.22);padding:4px;
+  }
+  .pop-item{
+    display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;font-size:13px;
+    text-align:left;border:none;background:transparent;color:var(--text);cursor:pointer;
+    white-space:nowrap;border-radius:6px;
+  }
+  .pop-item:hover{background:var(--surface-2)}
+  .pop-item.active{background:var(--accent-soft);color:var(--accent-2);font-weight:600}
+  .pop-item .p-check{margin-left:auto;color:var(--accent)}
+  .pop-item .p-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+  /* ---------- Board kanban ---------- */
+  .board{display:flex;gap:16px;padding:16px 24px;flex:1;align-items:stretch;overflow-x:auto}
+  .col{flex:1;min-width:180px;display:flex;flex-direction:column}
+  .col-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:0 2px}
+  .col-dot{width:7px;height:7px;border-radius:var(--r-full)}
+  .col-name{font-size:12px;font-weight:600;color:var(--text-2)}
+  .col-count{
+    font-size:11px;color:var(--muted);font-weight:500;background:var(--border);
+    padding:0 8px;border-radius:var(--r-md);margin-left:2px;
+  }
+  .col-body{flex:1;min-height:80px;border-radius:var(--r-md);padding:4px;transition:background .15s}
+  .col-body.col-over{background:var(--accent-soft);outline:1.5px dashed var(--accent)}
+  .col-empty{
+    font-size:12px;color:var(--muted-3);text-align:center;padding:16px 0;
+    border:1px dashed var(--border-2);border-radius:var(--r-md);
+  }
+
+  /* ---------- Kartu order ---------- */
+  .card-hover{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);
+    padding:12px;margin-bottom:8px;box-shadow:0 1px 2px rgba(0,0,0,0.04);cursor:pointer;
+    transition:box-shadow .15s ease,border-color .15s ease,transform .15s ease;
+  }
+  .card-hover:hover{
+    box-shadow:0 6px 20px var(--card-hover-shadow)!important;
+    border-color:var(--card-hover-border)!important;
+    transform:translateY(-2px);
+  }
+  .card-hover:active{transform:translateY(0)}
+  .card-hover.dragging{opacity:.5}
+  .card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .card-kode{font-size:11px;color:var(--muted-3);font-weight:500;flex-shrink:0}
+  .card-judul{
+    font-size:13px;font-weight:500;color:var(--text);margin-bottom:12px;line-height:1.45;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;
+  }
+  .card-bottom{display:flex;align-items:center;gap:8px;min-width:0}
+  .card-dl{
+    display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;
+    white-space:nowrap;margin-left:auto;flex-shrink:0;color:var(--muted);
+  }
+  .card-dl.urgent{color:var(--danger)}
+
+  /* ---------- Badge ---------- */
+  .produk-badge{
+    display:inline-flex;align-items:center;font-size:11px;font-weight:600;color:#fff;
+    padding:2px 8px;border-radius:var(--r-sm);letter-spacing:.01em;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;max-width:100%;
+  }
+  .prio-badge{
+    display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;
+    padding:2px 8px;border-radius:var(--r-sm);
+  }
+  .prio-badge .pdot{width:5px;height:5px;border-radius:var(--r-full);display:inline-block}
+  .status-pill{
+    display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
+    padding:2px 8px;border-radius:var(--r-sm);white-space:nowrap;
+  }
+  .status-pill .sdot{width:5px;height:5px;border-radius:var(--r-full);display:inline-block}
+  .avatar{
+    border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;
+    font-weight:600;flex-shrink:0;letter-spacing:-0.02em;
+  }
+  .avatar-empty{
+    border-radius:var(--r-full);background:var(--border);display:flex;align-items:center;
+    justify-content:center;color:var(--muted-2);flex-shrink:0;
+  }
+
+  /* ---------- Tabel order (meniru OrderTable.tsx) ---------- */
+  .table-wrap{flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;padding:12px 24px 16px}
+  .table-groupbar{display:flex;align-items:center;gap:8px;margin-bottom:10px;max-width:100%;overflow-x:auto}
+  .seg-group{display:inline-flex;gap:2px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:var(--r-md);padding:2px;flex-shrink:0}
+  .seg-group button{
+    padding:3px 10px;font-size:12px;font-weight:600;border:none;border-radius:var(--r-sm);
+    cursor:pointer;background:transparent;color:var(--muted-3);
+  }
+  .seg-group button.on{background:var(--surface);color:var(--accent-2);box-shadow:0 1px 2px rgba(0,0,0,0.06)}
+  .table-scroll{
+    flex:1;min-width:0;overflow:auto;-webkit-overflow-scrolling:touch;
+    border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface);
+  }
+  .order-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+  .order-table th{
+    position:sticky;top:0;background:var(--surface);z-index:2;text-align:left;
+    padding:10px 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;
+    color:var(--muted-3);border-bottom:1px solid var(--border-2);white-space:nowrap;
+    user-select:none;cursor:pointer;
+  }
+  .order-table th.sort-on{color:var(--accent-2)}
+  .order-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+  .table-row{transition:background .12s ease}
+  .table-row:hover{background:var(--surface-2)}
+  .row-title{cursor:pointer;transition:color .12s ease}
+  .row-title:hover{color:var(--accent-2);text-decoration:underline}
+  .cell-edit{
+    display:inline-flex;align-items:center;gap:3px;max-width:100%;
+    border:1px solid transparent;border-radius:var(--r-md);padding:3px 7px;
+    background:none;font:inherit;color:inherit;cursor:pointer;
+    transition:background .13s ease,border-color .13s ease,box-shadow .13s ease;
+  }
+  .cell-edit:hover{background:var(--surface-2);border-color:var(--border-2);box-shadow:0 1px 2px rgba(0,0,0,0.05)}
+  .cell-edit .cell-caret{opacity:.35;transition:opacity .13s ease}
+  .cell-edit:hover .cell-caret{opacity:.7}
+  .grp-head{cursor:pointer;background:var(--surface-2)}
+  .grp-head td{padding:8px 12px;border-top:1px solid var(--border-2);border-bottom:1px solid var(--border-2)}
+  .grp-label{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--text-2);letter-spacing:.01em}
+  .grp-chevron{display:inline-flex;color:var(--muted-3);transition:transform .12s}
+  .grp-count{
+    font-size:11px;font-weight:600;color:var(--muted-3);background:var(--surface);
+    border:1px solid var(--border-2);border-radius:var(--r-full);padding:1px 8px;
+  }
+  .dl-edit{position:relative;display:inline-flex}
+  .dl-edit input[type=date]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+
+  /* ---------- Detail overlay (halaman order/[id]) ---------- */
+  .detail-overlay{position:fixed;inset:0;background:var(--bg);z-index:100;overflow-y:auto;display:none}
+  .detail-overlay.open{display:block}
+  .detail-wrap{min-height:100vh;padding:24px 32px 40px}
+  .detail-inner{max-width:1040px;margin:0 auto}
+  .detail-topline{display:flex;align-items:center;justify-content:space-between}
+  .back-board{
+    font-size:13px;color:var(--accent-2);text-decoration:none;display:inline-flex;
+    align-items:center;gap:4px;background:none;border:none;cursor:pointer;font-weight:500;
+  }
+  .detail-cols{display:flex;gap:16px;margin-top:16px;align-items:flex-start}
+  .detail-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
+  .detail-side{width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:12px}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg)}
+  .brief-card{padding:24px}
+  .brief-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .brief-judul{font-size:24px;font-weight:600;color:var(--text);margin-bottom:16px;letter-spacing:-0.01em}
+  .brief-teks{font-size:15px;color:var(--text-2);line-height:1.7;margin-bottom:16px;white-space:pre-wrap}
+  .brief-meta-row{display:flex;flex-wrap:wrap;gap:24px;padding-top:16px;border-top:1px solid var(--surface-2)}
+  .meta-lbl{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
+  .meta-val{font-size:13px;color:var(--text);font-weight:500}
+  .brief-detail{margin-top:16px;padding-top:16px;border-top:1px solid var(--surface-2)}
+  .brief-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 24px;margin-top:12px}
+  .inp{
+    width:100%;padding:8px 12px;font-size:15px;border:1px solid var(--border-2);
+    border-radius:var(--r-md);color:var(--text);background:var(--surface);margin-bottom:8px;
+  }
+  .lbl{display:block;font-size:11px;color:var(--muted);font-weight:500;margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .btn-edit{
+    margin-left:auto;padding:4px 12px;font-size:12px;font-weight:500;background:var(--surface);
+    color:var(--accent-2);border:1px solid var(--border-2);border-radius:var(--r-md);cursor:pointer;
+  }
+  .btn-save{padding:8px 16px;font-size:13px;font-weight:500;background:var(--accent-2);color:#fff;border:none;border-radius:var(--r-md);cursor:pointer}
+  .btn-cancel{padding:8px 16px;font-size:13px;font-weight:500;background:var(--surface);color:var(--muted-3);border:1px solid var(--border-2);border-radius:var(--r-md);cursor:pointer}
+  .side-card{padding:16px}
+  .side-lbl{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:8px;text-transform:uppercase;letter-spacing:.03em}
+  .side-sel{
+    width:100%;padding:8px;font-size:13px;border:1px solid var(--border-2);border-radius:var(--r-md);
+    color:var(--text);background:var(--surface);cursor:pointer;
+  }
+  .btn-wa{
+    display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;font-size:13px;
+    font-weight:500;background:#25D366;color:#fff;border:none;border-radius:var(--r-md);
+    text-decoration:none;cursor:pointer;width:100%;
+  }
+  .btn-ghost{
+    padding:8px;font-size:12px;font-weight:500;background:var(--surface);color:var(--warning-dark);
+    border:1px solid var(--border);border-radius:var(--r-md);cursor:pointer;width:100%;
+  }
+  .durasi-big{font-size:19px;font-weight:700;color:var(--text)}
+  .durasi-sub{font-size:11px;color:var(--muted-3);margin-top:2px}
+  .durasi-row{display:flex;align-items:center;gap:8px;font-size:12px}
+  .durasi-row .st{width:90px;color:var(--text-3)}
+  .durasi-row .val{color:var(--text);font-weight:500}
+  .act-item{display:flex;gap:8px}
+  .act-teks{font-size:12px;color:var(--text-2);line-height:1.45}
+  .act-waktu{font-size:11px;color:var(--muted-2);margin-top:2px}
+
+  /* ---------- Komentar ---------- */
+  .comment-card{padding:20px}
+  .comment-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px}
+  .comment-title .cnt{font-size:12px;color:var(--muted);font-weight:400}
+  .comment-list{display:flex;flex-direction:column;gap:16px;margin-bottom:16px;max-height:400px;overflow-y:auto}
+  .comment-item{display:flex;gap:8px}
+  .comment-head{display:flex;align-items:baseline;gap:8px}
+  .comment-nama{font-size:13px;font-weight:600;color:var(--text)}
+  .comment-waktu{font-size:11px;color:var(--muted-2)}
+  .comment-isi{font-size:13px;color:var(--text-2);margin-top:4px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+  .comment-balas{border:none;background:none;color:var(--accent-2);font-size:12px;font-weight:500;cursor:pointer;padding:0;margin-top:4px}
+  .comment-input-row{display:flex;gap:8px;align-items:center;padding-top:16px;border-top:1px solid var(--surface-2)}
+  .comment-attach{
+    flex-shrink:0;width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+    background:var(--surface);border:1px solid var(--border-2);border-radius:var(--r-md);
+    cursor:pointer;color:var(--muted);
+  }
+  .comment-input{
+    flex:1;padding:8px 12px;font-size:13px;border:1px solid var(--border-2);border-radius:var(--r-md);
+    color:var(--text);background:var(--surface);outline:none;
+  }
+  .comment-send{
+    flex-shrink:0;padding:0 16px;height:38px;font-size:19px;border:none;border-radius:var(--r-md);cursor:pointer;
+    background:var(--accent);color:#fff;
+  }
+
+  /* ---------- Halaman: padding & label section ---------- */
+  .page-pad{padding:20px 28px 40px}
+  .section-lbl{font-size:12px;font-weight:600;color:var(--text-3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.03em}
+  .card-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px}
+  .empty-dashed{border:1px dashed var(--border-2);border-radius:var(--r-lg);padding:40px 0;text-align:center;font-size:13px;color:var(--muted-2)}
+
+  /* ---------- Tabs (Tabs.tsx — analitik) ---------- */
+  .tabs-bar{display:flex;gap:4px;border-bottom:1px solid var(--border);padding:0 24px;background:var(--surface)}
+  .tab-row{padding:12px 16px;font-size:13px;font-weight:500;color:var(--muted-3);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;transition:color var(--t-fast),border-color var(--t-fast)}
+  .tab-row.tab-on{font-weight:600;color:var(--accent);border-bottom-color:var(--accent)}
+  .tab-row:not(.tab-on):hover{color:var(--text-2);border-bottom-color:var(--border-2)}
+
+  /* ---------- Dashboard ---------- */
+  .chip{padding:8px 12px;font-size:12px;font-weight:500;background:var(--surface);color:var(--text-3);border:1px solid var(--border-2);border-radius:var(--r-md);cursor:pointer}
+  .chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+  .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;cursor:pointer}
+  .kpi-val{font-size:24px;font-weight:700;letter-spacing:-0.02em;margin:0}
+  .dash-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .insight{display:flex;gap:12px;border-radius:var(--r-md);padding:12px 16px}
+  .insight .i-dot{width:8px;height:8px;border-radius:var(--r-sm);margin-top:4px;flex-shrink:0}
+  .colchart{display:flex;align-items:flex-end;gap:16px;height:180px}
+  .cc{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;min-width:0}
+  .cc-bar{width:100%;max-width:64px;border-radius:4px 4px 0 0}
+  .cc-val{font-size:11px;font-weight:600;color:var(--text-2)}
+  .cc-lbl{font-size:11px;color:var(--muted-3);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .hbar-row{display:flex;align-items:center;gap:12px}
+  .hbar-track{flex:1;height:22px;background:var(--surface-2);border-radius:var(--r-sm);position:relative;overflow:hidden}
+
+  /* ---------- Kalender ---------- */
+  .cal-scroll{overflow-x:auto;max-width:100%}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden}
+  .cal-chip{display:flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:var(--r-sm);margin-top:4px;line-height:1.35;font-weight:500;min-width:0;cursor:pointer}
+
+  /* ---------- Arsip ---------- */
+  .seg-tabs{display:flex;gap:4px;background:var(--border);border-radius:var(--r-md);padding:4px}
+  .seg-tabs button{height:36px;padding:0 16px;font-size:12px;font-weight:500;border:none;border-radius:var(--r-md);cursor:pointer;background:transparent;color:var(--muted-3);display:inline-flex;align-items:center}
+  .seg-tabs button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,0.06)}
+  .asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
+  .asset-card{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;background:var(--surface)}
+  .asset-thumb{height:110px;background:var(--surface-2);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted-3);position:relative}
+  .link-plain{font-size:11px;color:var(--info-dark);background:none;border:none;padding:0;cursor:pointer;font-weight:500}
+  .link-order{font-size:11px;color:var(--accent-2);text-decoration:none;margin-left:auto;cursor:pointer}
+
+  /* ---------- Modal umum (lightbox / drill / pesanan baru) ---------- */
+  .modal-overlay{position:fixed;inset:0;background:rgba(20,20,18,0.45);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+  .modal-overlay.gelap{background:rgba(20,20,18,0.82)}
+  .modal-box{width:100%;max-width:480px;background:var(--surface);border-radius:var(--r-lg);padding:24px;max-height:90vh;overflow-y:auto}
+  .modal-lbl{display:block;font-size:12px;font-weight:500;color:var(--text-2);margin-bottom:8px}
+  .modal-inp{width:100%;height:36px;padding:0 12px;font-size:13px;margin-bottom:16px;border:1px solid var(--border-2);border-radius:var(--r-md);color:var(--text);background:var(--surface)}
+  textarea.modal-inp{height:auto;padding:8px 12px;resize:vertical}
+  .lb-arrow{
+    position:fixed;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:var(--r-full);
+    border:none;background:rgba(255,255,255,0.9);color:#1A1A17;font-size:24px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;z-index:201;padding-bottom:4px;
+  }
+
+  /* ---------- Tim ---------- */
+  .tim-list{background:var(--surface);border:1px solid var(--border-2);border-radius:var(--r-lg);overflow:hidden}
+  .tim-row{display:flex;align-items:center;gap:12px;padding:12px 16px}
+  .link-del{border:none;background:none;color:var(--danger);font-size:12px;cursor:pointer}
+
+  /* ---------- Footer demo ---------- */
+  .demo-footer{
+    padding:14px 24px 18px;border-top:1px solid var(--border);
+    color:var(--muted);font-size:12px;text-align:center;background:var(--surface-3);
+  }
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--text);color:var(--bg);font-size:12.5px;font-weight:500;
+    padding:8px 16px;border-radius:var(--r-md);opacity:0;pointer-events:none;
+    transition:opacity .18s ease,transform .18s ease;z-index:400;max-width:90vw;text-align:center;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ---------- Responsif (mengikuti globals.css asli) ---------- */
+  @media (max-width:768px){
+    .topbar{padding:10px 14px}
+    .app-sidebar{width:56px;padding:16px 8px;height:auto;min-height:calc(100vh - 40px)}
+    .app-sidebar .nav-label,.app-sidebar .app-brand-text,.app-sidebar .nav-badge,.app-sidebar .profile-text{display:none}
+    .app-sidebar .nav-row{justify-content:center;padding:8px 0}
+    .app-sidebar .app-brand{justify-content:center;padding-left:0;padding-right:0}
+    .app-sidebar .profile-btn{justify-content:center;padding:8px 0}
+    .app-sidebar .profile-btn > svg:last-child{display:none}
+    .app-header{padding:12px 14px;gap:8px}
+    .app-header h1{font-size:16px}
+    .app-header-actions{gap:8px}
+    .btn-new-order{padding:7px 11px;font-size:12px}
+    .filter-bar{padding:12px 12px 0}
+    .filter-search{flex:1 1 100%;width:100%;min-width:0}
+    .board{flex-direction:column;gap:12px;padding:12px;overflow-x:visible}
+    .table-wrap{padding:12px 12px 16px}
+    .order-table{min-width:680px}
+    .order-table th,.order-table td{padding:8px 10px}
+    .order-table .col-judul{position:sticky;left:0;background:var(--surface);max-width:180px;box-shadow:1px 0 0 var(--border-2);z-index:1}
+    .order-table th.col-judul{z-index:3}
+    .detail-wrap{padding:16px 12px 32px}
+    .detail-cols{flex-direction:column}
+    .detail-main,.detail-side{width:100%}
+    .brief-grid{grid-template-columns:1fr 1fr}
+    .page-pad{padding:16px 12px 32px}
+    .kpi-grid{grid-template-columns:1fr 1fr}
+    .dash-2col{grid-template-columns:1fr}
+    .cal-grid{min-width:640px}
+    .bell-panel{width:min(300px,calc(100vw - 24px))}
+    .hide-mobile{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar portfolio (bukan bagian app asli) -->
+<div class="topbar">
+  <a class="backlink" href="../index.html">← Portfolio Ridwan Yahya</a>
+  <span class="demo-pill">DEMO — data contoh, bukan data klien</span>
+</div>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="app-sidebar">
+    <div class="app-brand" onclick="goPage('board')">
+      <span class="brand-mark">S</span>
+      <span class="app-brand-text">StudioOrder</span>
+    </div>
+    <nav id="sideNav"></nav>
+    <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--border)">
+      <button class="profile-btn" id="profileBtn">
+        <span id="profileAvatar"></span>
+        <span class="profile-text">
+          <span class="p-name">Akun Demo</span><br>
+          <span class="p-role">Designer</span>
+        </span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main>
+    <div class="app-header">
+      <div style="min-width:0">
+        <h1 id="hdrTitle">Board pesanan</h1>
+        <p class="subtitle" id="hdrSub"></p>
+      </div>
+      <div class="app-header-actions">
+        <span id="calNav" style="display:none;align-items:center;gap:8px">
+          <button class="nav-btn" style="font-size:12px" onclick="calToday()">Hari ini</button>
+          <button class="nav-btn" onclick="calGo(-1)">‹</button>
+          <button class="nav-btn" onclick="calGo(1)">›</button>
+        </span>
+        <button class="btn-new-order" id="newOrderBtn" onclick="openNewOrder()">+ Pesanan<span class="hide-mobile"> baru</span></button>
+        <button class="btn-theme" id="themeBtn" onclick="toggleTheme()" title="Mode gelap"></button>
+        <div id="bellWrap" style="position:relative">
+          <button class="icon-btn" id="bellBtn" title="Notifikasi" aria-label="Notifikasi">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="bell-badge" id="bellBadge" style="display:none"></span>
+          </button>
+          <div id="bellPanel"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter bar (hanya halaman board) -->
+    <div class="filter-bar" id="filterBar">
+      <div class="view-toggle">
+        <button id="vtPapan" type="button" title="Tampilan Papan" onclick="setView('kanban')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="11" rx="1"/><rect x="17" y="4" width="4" height="14" rx="1"/></svg>
+          Papan
+        </button>
+        <button id="vtTabel" type="button" title="Tampilan Tabel" onclick="setView('table')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18M3 12h18M3 19h18"/></svg>
+          Tabel
+        </button>
+      </div>
+      <input id="searchInput" class="filter-search" placeholder="Cari judul…" oninput="state.q=this.value;renderContent()">
+      <button class="iconfilter-btn" id="fAssigneeBtn" title="Assignee" aria-label="Assignee" onclick="openFilter('assignee',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 6a3 3 0 0 1 0 6M21 20c0-2.5-1.5-4-3.5-4.5"/></svg>
+      </button>
+      <button class="iconfilter-btn" id="fPrioritasBtn" title="Prioritas" aria-label="Prioritas" onclick="openFilter('prioritas',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21v-4l11-11 4 4L7 21z"/><path d="M12 8l4 4"/></svg>
+      </button>
+      <button class="iconfilter-btn" id="fProdukBtn" title="Jenis produk" aria-label="Jenis produk" onclick="openFilter('produk',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7L12 12l8.7-5M12 22V12"/></svg>
+      </button>
+      <button class="iconfilter-btn" id="fWaktuBtn" title="Filter waktu" aria-label="Filter waktu" onclick="openFilter('waktu',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+      </button>
+      <button class="btn-reset" id="resetBtn" style="display:none" onclick="resetFilter()">Reset</button>
+    </div>
+
+    <!-- Tabs analitik (hanya halaman analitik) -->
+    <div class="tabs-bar" id="tabsBar" style="display:none"></div>
+
+    <!-- Konten halaman -->
+    <div id="content" style="flex:1;display:flex;flex-direction:column;min-height:0"></div>
+  </main>
+</div>
+
+<!-- Detail overlay -->
+<div class="detail-overlay" id="detailOverlay"></div>
+<!-- Modal (lightbox / drill-down / pesanan baru) -->
+<div id="modalRoot"></div>
+
+<footer class="demo-footer">Demo statis dengan data contoh · Sistem aslinya live dan dipakai klien di production</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   StudioOrder — demo statis.
+   Semua data contoh disimpan di memori browser
+   (refresh halaman = kembali ke kondisi awal).
+   ============================================================ */
+
+/* ---------- Util ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hari=864e5;
+const todayISO=()=>{const t=new Date();return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0')};
+const d=n=>{const t=new Date(Date.now()+n*hari);return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0')};
+const BLN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const BLNF=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const fmtTgl=iso=>{if(!iso)return'—';const[a,b,c]=iso.split('-');return `${+c} ${BLN[+b-1]} ${a}`};
+const selisih=iso=>Math.round((new Date(iso+'T00:00:00')-new Date(todayISO()+'T00:00:00'))/hari);
+const labelDl=iso=>{const s=selisih(iso);if(s<0)return`Terlambat ${-s} hari`;if(s===0)return'Hari ini';if(s===1)return'Besok';return`${s} hari lagi`};
+const inisial=n=>n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+let toastTimer;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200)}
+
+/* ---------- Master data ---------- */
+const TEAM=[
+  {id:'u1',nama:'Akun Demo',role:'Designer',warna:'#1B7A5A'},
+  {id:'u2',nama:'Sari Wulandari',role:'Designer',warna:'#8B5BC0'},
+  {id:'u3',nama:'Bima Pratama',role:'Video Editor',warna:'#378ADD'},
+  {id:'u4',nama:'Dina Marlina',role:'Content Writer',warna:'#B07208'},
+];
+const PRODUK=[
+  {nama:'Banner',warna:'#1B7A5A'},
+  {nama:'Konten Sosmed',warna:'#378ADD'},
+  {nama:'Video',warna:'#8B5BC0'},
+  {nama:'Brosur',warna:'#B07208'},
+  {nama:'Lainnya',warna:'#6E6E68'},
+];
+const STATUS=[
+  {id:'antrian',nama:'Antrian',warna:'#9A9A92'},
+  {id:'dikerjakan',nama:'Dikerjakan',warna:'#378ADD'},
+  {id:'review',nama:'Review',warna:'#B07208'},
+  {id:'revisi',nama:'Revisi',warna:'#C0392B'},
+  {id:'selesai',nama:'Selesai',warna:'#1B7A5A'},
+];
+const PRIO=[
+  {id:'tinggi',nama:'Tinggi',warna:'#C0392B'},
+  {id:'sedang',nama:'Sedang',warna:'#B07208'},
+  {id:'rendah',nama:'Rendah',warna:'#378ADD'},
+];
+const user=id=>TEAM.find(u=>u.id===id);
+const produk=n=>PRODUK.find(p=>p.nama===n)||PRODUK[4];
+const status=id=>STATUS.find(s=>s.id===id);
+const prio=id=>PRIO.find(p=>p.id===id);
+const avatar=(u,sz=24)=>u
+  ?`<span class="avatar" style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.42)}px;background:${u.warna}22;color:${u.warna}">${esc(inisial(u.nama))}</span>`
+  :`<span class="avatar-empty" style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.5)}px">–</span>`;
+const avatarByName=(n,sz=24)=>avatar(TEAM.find(u=>u.nama===n)||{nama:n,warna:'#9A9A92'},sz);
+
+/* ---------- Data contoh pesanan ---------- */
+let ORDERS=[
+  {id:'o1',kode:'DSN-1042',judul:'Banner promo bakti sosial Agustus',produk:'Banner',prio:'tinggi',status:'dikerjakan',assignee:'u1',dl:d(2),dibuat:d(-4),pemesan:'Cabang Jakarta Timur',
+   brief:'Banner 3x1m untuk kegiatan bakti sosial 24 Agustus. Warna dominan hijau sesuai panduan brand, sertakan logo mitra di kanan bawah dan QR code donasi.',
+   comments:[{nama:'Sari Wulandari',waktu:'2 jam lalu',isi:'@Akun Demo warna hijaunya tolong disamakan dengan panduan brand ya, yang sekarang agak terlalu muda.',balas:[{nama:'Akun Demo',waktu:'1 jam lalu',isi:'Siap, sudah kusesuaikan di revisi kedua.'}]}],
+   aktif:[{teks:'Sari Wulandari menambahkan komentar',waktu:'2 jam lalu'},{teks:'Status diubah menjadi Dikerjakan',waktu:'Kemarin'},{teks:'Pesanan dibuat',waktu:'4 hari lalu'}]},
+  {id:'o2',kode:'DSN-1041',judul:'Video dokumentasi penyaluran qurban',produk:'Video',prio:'tinggi',status:'review',assignee:'u3',dl:d(1),dibuat:d(-9),pemesan:'Divisi Program',
+   brief:'Video 3 menit dari footage penyaluran qurban di 4 titik. Tone hangat dan mengharukan, musik instrumentik, closing slide ajakan donasi.',
+   comments:[{nama:'Bima Pratama',waktu:'3 jam lalu',isi:'Draft v2 sudah kuupload. Bagian menit 1:20 kuganti footage yang lebih stabil.'}],
+   aktif:[{teks:'Status diubah menjadi Review',waktu:'3 jam lalu'},{teks:'Pesanan dibuat',waktu:'9 hari lalu'}]},
+  {id:'o3',kode:'DSN-1040',judul:'Konten IG: testimoni penerima manfaat',produk:'Konten Sosmed',prio:'sedang',status:'dikerjakan',assignee:'u4',dl:d(4),dibuat:d(-3),pemesan:'Cabang Bandung',
+   brief:'Carousel 5 slide berisi testimoni 3 penerima manfaat program beasiswa. Foto sudah ada di arsip aset, tinggal layout dan copy singkat.'},
+  {id:'o4',kode:'DSN-1039',judul:'Brosur program wakaf produktif',produk:'Brosur',prio:'rendah',status:'antrian',assignee:null,dl:d(10),dibuat:d(-2),pemesan:'Divisi Fundraising',
+   brief:'Brosur lipat 3 menjelaskan skema wakaf produktif untuk jamaah. Bahasa sederhana, banyak ilustrasi, sertakan tabel simulasi manfaat.'},
+  {id:'o5',kode:'DSN-1038',judul:'Banner spanduk konser amal',produk:'Banner',prio:'sedang',status:'antrian',assignee:null,dl:d(6),dibuat:d(-2),pemesan:'Cabang Surabaya',
+   brief:'Spanduk 4x2m untuk konser amal akhir bulan. Nama pengisi acara menyusul via komentar, desain bisa jalan dulu untuk layout utama.'},
+  {id:'o6',kode:'DSN-1037',judul:'Revisi landing page campaign Ramadan',produk:'Lainnya',prio:'tinggi',status:'revisi',assignee:'u1',dl:d(-1),dibuat:d(-12),pemesan:'Divisi Digital',
+   brief:'Revisi hero section landing page campaign: ganti foto utama, perbesar tombol donasi, dan tambahkan counter dana terkumpul.',
+   comments:[{nama:'Divisi Digital',waktu:'Kemarin',isi:'Tombol donasinya masih kurang menonjol di mobile. Tolong dibuat full-width ya.'}],
+   aktif:[{teks:'Status diubah menjadi Revisi',waktu:'Kemarin'},{teks:'Pesanan dibuat',waktu:'12 hari lalu'}]},
+  {id:'o7',kode:'DSN-1036',judul:'Video profil relawan 60 detik',produk:'Video',prio:'sedang',status:'dikerjakan',assignee:'u3',dl:d(5),dibuat:d(-6),pemesan:'Divisi SDM',
+   brief:'Video profil 3 relawan teladan untuk diputar saat gathering tahunan. Wawancara sudah direkam, tinggal editing + subtitle.'},
+  {id:'o8',kode:'DSN-1035',judul:'Set konten harian pekan ke-3',produk:'Konten Sosmed',prio:'rendah',status:'antrian',assignee:'u4',dl:d(8),dibuat:d(-1),pemesan:'Divisi Komunikasi',
+   brief:'7 konten harian (quote, fakta program, ajakan donasi) mengikuti template yang sudah ada. Cukup ganti teks dan foto pendukung.'},
+  {id:'o9',kode:'DSN-1034',judul:'Banner ucapan Idul Adha',produk:'Banner',prio:'sedang',status:'selesai',assignee:'u1',dl:d(-3),dibuat:d(-8),selesaiAt:d(-5),pemesan:'Sekretariat',
+   brief:'Banner ucapan Idul Adha untuk lobi kantor pusat dan versi story IG.'},
+  {id:'o10',kode:'DSN-1033',judul:'Infografis laporan donasi Q2',produk:'Konten Sosmed',prio:'tinggi',status:'review',assignee:'u4',dl:d(0),dibuat:d(-5),pemesan:'Divisi Fundraising',
+   brief:'Infografis 3 slide: total donasi Q2, sebaran program, dan pertumbuhan donatur. Angka final dari finance menyusul, desain pakai angka sementara.',
+   comments:[{nama:'Dina Marlina',waktu:'1 jam lalu',isi:'Angka sementara sudah masuk. Tinggal tunggu validasi finance sebelum final.'}]},
+  {id:'o11',kode:'DSN-1032',judul:'Brosur layanan ambulans gratis',produk:'Brosur',prio:'rendah',status:'selesai',assignee:'u2',dl:d(-8),dibuat:d(-14),selesaiAt:d(-9),pemesan:'Cabang Semarang',
+   brief:'Brosur A5 dua sisi berisi info layanan ambulans gratis dan nomor darurat tiap cabang.'},
+  {id:'o12',kode:'DSN-1031',judul:'Video teaser gala dinner donatur',produk:'Video',prio:'tinggi',status:'dikerjakan',assignee:'u3',dl:d(3),dibuat:d(-4),pemesan:'Divisi Fundraising',
+   brief:'Teaser 30 detik untuk undangan gala dinner donatur. Elegan, minim teks, fokus ke suasana acara tahun lalu.'},
+  {id:'o13',kode:'DSN-1030',judul:'Konten TikTok behind the scene',produk:'Konten Sosmed',prio:'sedang',status:'antrian',assignee:null,dl:d(7),dibuat:d(-1),pemesan:'Divisi Komunikasi',
+   brief:'Konsep 3 video TikTok behind the scene kegiatan lapangan. Yang dibutuhkan: storyboard sederhana + caption.'},
+  {id:'o14',kode:'DSN-1029',judul:'Banner billboard tol Cikampek',produk:'Banner',prio:'tinggi',status:'selesai',assignee:'u2',dl:d(-10),dibuat:d(-18),selesaiAt:d(-12),pemesan:'Kantor Pusat',
+   brief:'Billboard 10x5m kampanye bulan donasi. Copy final dari direksi, desain harus terbaca dari jarak 100m.'},
+  {id:'o15',kode:'DSN-1028',judul:'Desain sertifikat donatur tetap',produk:'Lainnya',prio:'rendah',status:'selesai',assignee:'u1',dl:d(-12),dibuat:d(-16),selesaiAt:d(-13),pemesan:'Divisi Fundraising',
+   brief:'Template sertifikat apresiasi untuk donatur tetap, versi cetak A4 dan versi digital.'},
+  {id:'o16',kode:'DSN-1027',judul:'Konten story countdown program air bersih',produk:'Konten Sosmed',prio:'sedang',status:'review',assignee:'u4',dl:d(2),dibuat:d(-3),pemesan:'Cabang Makassar',
+   brief:'5 story countdown H-5 sampai H-1 peluncuran program sumur air bersih. Gaya dinamis, sertakan sticker countdown.'},
+  {id:'o17',kode:'DSN-1026',judul:'Revisi logo kegiatan sunatan massal',produk:'Lainnya',prio:'sedang',status:'revisi',assignee:'u2',dl:d(-2),dibuat:d(-10),pemesan:'Cabang Bekasi',
+   brief:'Revisi logo kegiatan: perbesar elemen pita, ganti font tahun, dan sediakan versi monochrome.',
+   comments:[{nama:'Cabang Bekasi',waktu:'2 hari lalu',isi:'Versi kedua sudah lebih baik. Tinggal font tahunnya diganti yang lebih tegas.'}],
+   aktif:[{teks:'Status diubah menjadi Revisi',waktu:'2 hari lalu'},{teks:'Pesanan dibuat',waktu:'10 hari lalu'}]},
+  {id:'o18',kode:'DSN-1025',judul:'Banner mukena & alat sholat drive',produk:'Banner',prio:'rendah',status:'dikerjakan',assignee:'u1',dl:d(9),dibuat:d(-2),pemesan:'Cabang Yogyakarta',
+   brief:'Banner penggalangan mukena dan alat sholat untuk pondok pesantren. Target 500 paket, sertakan progress bar visual.'},
+];
+
+let NOTIF=[
+  {id:1,teks:'Sari Wulandari menandai Anda di "Banner promo bakti sosial Agustus"',waktu:'10 menit lalu',read:false,orderId:'o1'},
+  {id:2,teks:'"Video dokumentasi penyaluran qurban" masuk tahap review',waktu:'1 jam lalu',read:false,orderId:'o2'},
+  {id:3,teks:'Pesanan baru dari Cabang Makassar: "Konten story countdown air bersih"',waktu:'3 jam lalu',read:false,orderId:'o16'},
+  {id:4,teks:'"Revisi landing page campaign Ramadan" melewati deadline',waktu:'Kemarin',read:true,orderId:'o6'},
+];
+
+/* ---------- State ---------- */
+const state={page:'board',view:'kanban',q:'',fAssignee:null,fPrioritas:null,fProduk:null,fWaktu:null,
+  sort:{key:'dl',dir:1},groupBy:'status',calOffset:0,analTab:'ringkasan',arsipTab:'pesanan',collapsed:{}};
+let detailId=null,briefEdit=false,replyTo=null;
+
+function pushAct(o,teks){(o.aktif=o.aktif||[]).unshift({teks,waktu:'Baru saja'})}
+
+/* ---------- Filter ---------- */
+function filtered(){
+  const q=state.q.trim().toLowerCase();
+  return ORDERS.filter(o=>{
+    if(q&&!(o.judul.toLowerCase().includes(q)||o.kode.toLowerCase().includes(q)))return false;
+    if(state.fAssignee==='none'){if(o.assignee)return false}
+    else if(state.fAssignee&&o.assignee!==state.fAssignee)return false;
+    if(state.fPrioritas&&o.prio!==state.fPrioritas)return false;
+    if(state.fProduk&&o.produk!==state.fProduk)return false;
+    if(state.fWaktu){
+      const s=selisih(o.dl);
+      if(state.fWaktu==='today'&&s!==0)return false;
+      if(state.fWaktu==='week'&&!(s>=0&&s<=7))return false;
+      if(state.fWaktu==='late'&&!(s<0&&o.status!=='selesai'))return false;
+    }
+    return true;
+  });
+}
+function updateFilterUI(){
+  const map=[['#fAssigneeBtn',state.fAssignee],['#fPrioritasBtn',state.fPrioritas],['#fProdukBtn',state.fProduk],['#fWaktuBtn',state.fWaktu]];
+  map.forEach(([sel,val])=>{const b=$(sel);if(!b)return;b.classList.toggle('active',!!val);
+    let dot=b.querySelector('.fdot');
+    if(val&&!dot){dot=document.createElement('span');dot.className='fdot';b.appendChild(dot)}
+    if(!val&&dot)dot.remove();
+  });
+  const anyF=state.fAssignee||state.fPrioritas||state.fProduk||state.fWaktu||state.q;
+  $('#resetBtn').style.display=anyF?'inline-flex':'none';
+  $('#vtPapan').classList.toggle('on',state.view==='kanban');
+  $('#vtTabel').classList.toggle('on',state.view==='table');
+}
+function resetFilter(){state.fAssignee=state.fPrioritas=state.fProduk=state.fWaktu=null;state.q='';const si=$('#searchInput');if(si)si.value='';renderContent()}
+function goKpi(kind){
+  state.fAssignee=state.fPrioritas=state.fProduk=state.fWaktu=null;state.q='';const si=$('#searchInput');if(si)si.value='';
+  if(kind==='late')state.fWaktu='late';
+  if(kind==='noassign')state.fAssignee='none';
+  goPage('board');
+}
+
+/* ---------- Popup generik ---------- */
+let popEl=null,popGuard=false;
+function closePop(){if(popEl){popEl.remove();popEl=null}}
+function openPop(anchor,items){
+  closePop();popGuard=true;setTimeout(()=>popGuard=false,0);
+  const r=anchor.getBoundingClientRect();
+  popEl=document.createElement('div');popEl.className='pop';
+  popEl.innerHTML=items.map((it,i)=>`<button class="pop-item ${it.active?'active':''}" data-i="${i}">${it.dot?`<span class="p-dot" style="background:${it.dot}"></span>`:''}<span>${esc(it.label)}</span>${it.active?'<span class="p-check">✓</span>':''}</button>`).join('');
+  popEl.addEventListener('click',e=>{const b=e.target.closest('.pop-item');if(!b)return;items[+b.dataset.i].onClick();closePop()});
+  document.body.appendChild(popEl);
+  const pw=popEl.offsetWidth,ph=popEl.offsetHeight;
+  let x=Math.min(r.left,innerWidth-pw-12),y=r.bottom+6;
+  if(y+ph>innerHeight-12)y=r.top-ph-6;
+  popEl.style.left=Math.max(8,x)+'px';popEl.style.top=Math.max(8,y)+'px';
+}
+document.addEventListener('click',e=>{if(popGuard)return;if(popEl&&!e.target.closest('.pop'))closePop()});
+
+function openFilter(kind,btn){
+  const defs={
+    assignee:{get:()=>state.fAssignee,set:v=>state.fAssignee=v,items:()=>[{id:null,label:'Semua assignee'},...TEAM.map(u=>({id:u.id,label:u.nama,dot:u.warna})),{id:'none',label:'Tanpa assignee'}]},
+    prioritas:{get:()=>state.fPrioritas,set:v=>state.fPrioritas=v,items:()=>[{id:null,label:'Semua prioritas'},...PRIO.map(p=>({id:p.id,label:p.nama,dot:p.warna}))]},
+    produk:{get:()=>state.fProduk,set:v=>state.fProduk=v,items:()=>[{id:null,label:'Semua produk'},...PRODUK.map(p=>({id:p.nama,label:p.nama,dot:p.warna}))]},
+    waktu:{get:()=>state.fWaktu,set:v=>state.fWaktu=v,items:()=>[{id:null,label:'Semua waktu'},{id:'today',label:'Deadline hari ini'},{id:'week',label:'7 hari ke depan'},{id:'late',label:'Terlambat'}]},
+  };
+  const dfn=defs[kind];
+  openPop(btn,dfn.items().map(it=>({label:it.label,dot:it.dot,active:dfn.get()===it.id,onClick:()=>{dfn.set(it.id);renderContent()}})));
+}
+function openAssignPop(e,id){
+  e.stopPropagation();
+  const o=ORDERS.find(x=>x.id===id);if(!o)return;
+  const items=[{id:null,label:'Belum ditugaskan'},...TEAM.map(u=>({id:u.id,label:u.nama,dot:u.warna}))];
+  openPop(e.currentTarget,items.map(it=>({label:it.label,dot:it.dot,active:(o.assignee||null)===it.id,
+    onClick:()=>{o.assignee=it.id;pushAct(o,`Assignee diubah menjadi ${it.label}`);toast('Assignee diperbarui');renderContent()}})));
+}
+
+/* ---------- Board kanban ---------- */
+const dlIcon='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>';
+function cardHtml(o){
+  const p=produk(o.produk),pr=prio(o.prio),u=user(o.assignee);
+  const late=selisih(o.dl)<0&&o.status!=='selesai';
+  return `<div class="card-hover" draggable="true" ondragstart="dragStart(event,'${o.id}')" ondragend="this.classList.remove('dragging')" onclick="openDetail('${o.id}')">
+    <div class="card-top"><span class="card-kode">${o.kode}</span><span class="produk-badge" style="background:${p.warna}">${esc(o.produk)}</span></div>
+    <div class="card-judul">${esc(o.judul)}</div>
+    <div class="card-bottom">
+      ${avatar(u,22)}
+      <span class="prio-badge" style="background:${pr.warna}1a;color:${pr.warna}"><span class="pdot" style="background:${pr.warna}"></span>${pr.nama}</span>
+      <span class="card-dl ${late?'urgent':''}">${dlIcon}${labelDl(o.dl)}</span>
+    </div></div>`;
+}
+function boardHtml(){
+  const list=filtered();
+  return `<div class="board">${STATUS.map(st=>{
+    const items=list.filter(o=>o.status===st.id);
+    return `<div class="col">
+      <div class="col-head"><span class="col-dot" style="background:${st.warna}"></span><span class="col-name">${st.nama}</span><span class="col-count">${items.length}</span></div>
+      <div class="col-body" ondragover="colOver(event)" ondragleave="colLeave(event)" ondrop="colDrop(event,'${st.id}')">
+        ${items.length?items.map(cardHtml).join(''):'<div class="col-empty">Belum ada pesanan</div>'}
+      </div></div>`;
+  }).join('')}</div>`;
+}
+let dragId=null;
+function dragStart(e,id){dragId=id;e.target.classList.add('dragging');e.dataTransfer.effectAllowed='move'}
+function colOver(e){e.preventDefault();e.currentTarget.classList.add('col-over')}
+function colLeave(e){e.currentTarget.classList.remove('col-over')}
+function colDrop(e,st){e.preventDefault();e.currentTarget.classList.remove('col-over');if(!dragId)return;setStatus(dragId,st);dragId=null}
+function setStatus(id,st){
+  const o=ORDERS.find(x=>x.id===id);if(!o||o.status===st)return;
+  o.status=st;if(st==='selesai')o.selesaiAt=d(0);
+  pushAct(o,`Status diubah menjadi ${status(st).nama}`);
+  toast(`${o.kode} → ${status(st).nama}`);
+  renderContent();renderNav();
+}
+
+/* ---------- Tabel ---------- */
+function sortOrders(list){
+  const{key,dir}=state.sort;const rank={tinggi:0,sedang:1,rendah:2};
+  return [...list].sort((a,b)=>{
+    let va,vb;
+    if(key==='kode'){va=a.kode;vb=b.kode}
+    else if(key==='judul'){va=a.judul.toLowerCase();vb=b.judul.toLowerCase()}
+    else if(key==='prio'){va=rank[a.prio];vb=rank[b.prio]}
+    else{va=a.dl;vb=b.dl}
+    return (va<vb?-1:va>vb?1:0)*dir;
+  });
+}
+function setSort(key){if(state.sort.key===key)state.sort.dir*=-1;else state.sort={key,dir:1};renderContent()}
+function setGroupBy(v){state.groupBy=v;renderContent()}
+function toggleGroup(k){state.collapsed[k]=!state.collapsed[k];renderContent()}
+function groupKey(o){
+  if(state.groupBy==='status')return status(o.status).nama;
+  if(state.groupBy==='assignee')return o.assignee?user(o.assignee).nama:'Belum ditugaskan';
+  if(state.groupBy==='prio')return prio(o.prio).nama;
+  return '';
+}
+function tableHtml(){
+  const list=sortOrders(filtered());
+  const th=(key,label)=>`<th class="${state.sort.key===key?'sort-on':''}" onclick="setSort('${key}')">${label} ${state.sort.key===key?(state.sort.dir>0?'↑':'↓'):''}</th>`;
+  const rowHtml=o=>{
+    const p=produk(o.produk),pr=prio(o.prio),st=status(o.status),u=user(o.assignee);
+    const late=selisih(o.dl)<0&&o.status!=='selesai';
+    return `<tr class="table-row">
+      <td><span class="card-kode">${o.kode}</span></td>
+      <td class="col-judul"><span class="row-title" onclick="openDetail('${o.id}')">${esc(o.judul)}</span></td>
+      <td><span class="produk-badge" style="background:${p.warna}">${esc(o.produk)}</span></td>
+      <td><span class="prio-badge" style="background:${pr.warna}1a;color:${pr.warna}"><span class="pdot" style="background:${pr.warna}"></span>${pr.nama}</span></td>
+      <td><span class="status-pill" style="background:${st.warna}1a;color:${st.warna}"><span class="sdot" style="background:${st.warna}"></span>${st.nama}</span></td>
+      <td><button class="cell-edit" onclick="openAssignPop(event,'${o.id}')">${u?esc(u.nama):'Belum ditugaskan'}<span class="cell-caret">▾</span></button></td>
+      <td><span class="dl-edit"><span style="font-size:12.5px;${late?'color:var(--danger);font-weight:600':''}">${fmtTgl(o.dl)} · ${labelDl(o.dl)}</span><input type="date" value="${o.dl}" onchange="setDl('${o.id}',this.value)"></span></td>
+    </tr>`;
+  };
+  let rows='';
+  if(state.groupBy==='none'){
+    rows=list.map(rowHtml).join('');
+  }else{
+    const groups={},order=[];
+    list.forEach(o=>{const k=groupKey(o);if(!groups[k]){groups[k]=[];order.push(k)}groups[k].push(o)});
+    rows=order.map(k=>{
+      const col=state.collapsed[k];
+      return `<tr class="grp-head" onclick="toggleGroup('${k.replace(/'/g,"\\'")}')"><td colspan="7"><span class="grp-label"><span class="grp-chevron" style="transform:rotate(${col?'-90':'0'}deg)">▾</span>${esc(k)}<span class="grp-count">${groups[k].length}</span></span></td></tr>`+(col?'':groups[k].map(rowHtml).join(''));
+    }).join('');
+  }
+  return `<div class="table-wrap">
+    <div class="table-groupbar">
+      <div class="seg-group">${[['none','Tanpa grup'],['status','Status'],['assignee','Assignee'],['prio','Prioritas']].map(([v,l])=>`<button class="${state.groupBy===v?'on':''}" onclick="setGroupBy('${v}')">${l}</button>`).join('')}</div>
+      <span style="font-size:12px;color:var(--muted)">${list.length} pesanan</span>
+    </div>
+    <div class="table-scroll"><table class="order-table">
+      <thead><tr>${th('kode','Kode')}${th('judul','Judul')}<th>Produk</th>${th('prio','Prioritas')}<th>Status</th><th>Assignee</th>${th('dl','Deadline')}</tr></thead>
+      <tbody>${rows||'<tr><td colspan="7"><div class="empty-dashed">Tidak ada pesanan yang cocok dengan filter</div></td></tr>'}</tbody>
+    </table></div></div>`;
+}
+function setDl(id,val){const o=ORDERS.find(x=>x.id===id);if(!o||!val)return;o.dl=val;pushAct(o,`Deadline diubah menjadi ${fmtTgl(val)}`);toast('Deadline diperbarui');renderContent()}
+
+/* ---------- Detail pesanan (overlay) ---------- */
+function openDetail(id){detailId=id;briefEdit=false;replyTo=null;renderDetail();$('#detailOverlay').classList.add('open');document.body.style.overflow='hidden'}
+function closeDetail(){$('#detailOverlay').classList.remove('open');document.body.style.overflow='';detailId=null;renderContent();renderNav()}
+
+function commentHtml(c){
+  return `<div class="comment-item">${avatarByName(c.nama,28)}
+    <div style="flex:1;min-width:0">
+      <div class="comment-head"><span class="comment-nama">${esc(c.nama)}</span><span class="comment-waktu">${esc(c.waktu)}</span></div>
+      <div class="comment-isi">${esc(c.isi)}</div>
+      <button class="comment-balas" onclick="setReply('${c.nama.replace(/'/g,"\\'")}')">Balas</button>
+      ${(c.balas||[]).map(b=>`<div class="comment-item" style="margin-top:12px">${avatarByName(b.nama,24)}
+        <div style="flex:1;min-width:0">
+          <div class="comment-head"><span class="comment-nama">${esc(b.nama)}</span><span class="comment-waktu">${esc(b.waktu)}</span></div>
+          <div class="comment-isi">${esc(b.isi)}</div>
+        </div></div>`).join('')}
+    </div></div>`;
+}
+function setReply(nama){replyTo=nama;const inp=$('#commentInput');if(inp){inp.placeholder=`Balas ${nama}…`;inp.focus()}}
+function sendComment(){
+  const o=ORDERS.find(x=>x.id===detailId);const inp=$('#commentInput');
+  if(!o||!inp)return;const v=inp.value.trim();if(!v)return;
+  o.comments=o.comments||[];
+  o.comments.push({nama:'Akun Demo',waktu:'Baru saja',isi:replyTo?`@${replyTo} ${v}`:v});
+  replyTo=null;pushAct(o,'Menambahkan komentar');
+  renderDetail();toast('Komentar terkirim');
+}
+
+function briefEditOn(){briefEdit=true;renderDetail()}
+function briefCancel(){briefEdit=false;renderDetail()}
+function briefSave(){
+  const o=ORDERS.find(x=>x.id===detailId);if(!o)return;
+  const j=$('#editJudul').value.trim();
+  if(!j){toast('Judul tidak boleh kosong');return}
+  o.judul=j;o.brief=$('#editBrief').value;
+  pushAct(o,'Brief diperbarui');briefEdit=false;renderDetail();toast('Brief tersimpan');
+}
+function setOrderField(id,field,val){
+  const o=ORDERS.find(x=>x.id===id);if(!o)return;
+  if(field==='status'){
+    if(o.status===val)return;
+    o.status=val;if(val==='selesai')o.selesaiAt=d(0);
+    pushAct(o,`Status diubah menjadi ${status(val).nama}`);
+  }
+  if(field==='assignee'){
+    o.assignee=val||null;
+    pushAct(o,`Assignee diubah menjadi ${val?user(val).nama:'Belum ditugaskan'}`);
+  }
+  toast('Perubahan tersimpan');renderDetail();renderNav();
+}
+
+function renderDetail(){
+  const o=ORDERS.find(x=>x.id===detailId);
+  if(!o){closeDetail();return}
+  const p=produk(o.produk),pr=prio(o.prio),st=status(o.status);
+  const s=selisih(o.dl),late=s<0&&o.status!=='selesai';
+  const usia=Math.max(0,-selisih(o.dibuat));
+  const acts=(o.aktif&&o.aktif.length?o.aktif:[{teks:'Pesanan dibuat',waktu:`${usia} hari lalu`}]).slice(0,6);
+  const cmts=o.comments||[];
+  const cntKomen=cmts.reduce((n,c)=>n+1+(c.balas||[]).length,0);
+
+  const briefBody=briefEdit
+    ?`<label class="lbl">Judul</label><input id="editJudul" class="inp" value="${esc(o.judul)}">
+      <label class="lbl">Brief</label><textarea id="editBrief" class="inp" rows="6">${esc(o.brief)}</textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+        <button class="btn-cancel" onclick="briefCancel()">Batal</button>
+        <button class="btn-save" onclick="briefSave()">Simpan</button>
+      </div>`
+    :`<div class="brief-judul">${esc(o.judul)}</div>
+      <div class="brief-teks">${esc(o.brief)}</div>
+      <div class="brief-meta-row">
+        <div><div class="meta-lbl">Kode</div><div class="meta-val">${o.kode}</div></div>
+        <div><div class="meta-lbl">Dibuat</div><div class="meta-val">${fmtTgl(o.dibuat)}</div></div>
+        <div><div class="meta-lbl">Pemesan</div><div class="meta-val">${esc(o.pemesan)}</div></div>
+      </div>`;
+
+  $('#detailOverlay').innerHTML=`<div class="detail-wrap"><div class="detail-inner">
+    <div class="detail-topline">
+      <button class="back-board" onclick="closeDetail()">← Kembali ke board</button>
+      <span class="card-kode">${o.kode}</span>
+    </div>
+    <div class="detail-cols">
+      <div class="detail-main">
+        <div class="panel brief-card">
+          <div class="brief-head">
+            <span class="produk-badge" style="background:${p.warna}">${esc(o.produk)}</span>
+            <span class="prio-badge" style="background:${pr.warna}1a;color:${pr.warna}"><span class="pdot" style="background:${pr.warna}"></span>${pr.nama}</span>
+            ${briefEdit?'':'<button class="btn-edit" onclick="briefEditOn()">Edit brief</button>'}
+          </div>
+          ${briefBody}
+        </div>
+        <div class="panel comment-card">
+          <div class="comment-title">Komentar <span class="cnt">(${cntKomen})</span></div>
+          <div class="comment-list">${cmts.length?cmts.map(commentHtml).join(''):'<div style="font-size:12.5px;color:var(--muted-2)">Belum ada komentar. Jadi yang pertama!</div>'}</div>
+          <div class="comment-input-row">
+            <button class="comment-attach" title="Lampiran" onclick="toast('Lampiran dinonaktifkan di demo')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.4 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 1 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            </button>
+            <input id="commentInput" class="comment-input" placeholder="Tulis komentar…" onkeydown="if(event.key==='Enter')sendComment()">
+            <button class="comment-send" title="Kirim" onclick="sendComment()">→</button>
+          </div>
+        </div>
+      </div>
+      <div class="detail-side">
+        <div class="panel side-card">
+          <div class="side-lbl">Status</div>
+          <select class="side-sel" onchange="setOrderField('${o.id}','status',this.value)">
+            ${STATUS.map(x=>`<option value="${x.id}" ${x.id===o.status?'selected':''}>${x.nama}</option>`).join('')}
+          </select>
+        </div>
+        <div class="panel side-card">
+          <div class="side-lbl">Assignee</div>
+          <select class="side-sel" onchange="setOrderField('${o.id}','assignee',this.value)">
+            <option value="" ${!o.assignee?'selected':''}>Belum ditugaskan</option>
+            ${TEAM.map(u=>`<option value="${u.id}" ${u.id===o.assignee?'selected':''}>${esc(u.nama)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="panel side-card">
+          <div class="side-lbl">Pemesan</div>
+          <div style="font-size:13px;font-weight:500;margin-bottom:10px">${esc(o.pemesan)}</div>
+          <button class="btn-wa" onclick="toast('Di versi asli, tombol ini membuka WhatsApp pemesan')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .6l-.4.6-.5.5c-.2.2-.3.4-.1.7.2.3.9 1.5 2 2.4 1.4 1.2 2.5 1.6 2.8 1.7.3.2.5.1.7-.1l1-1.1c.2-.3.4-.2.7-.1l2 .9c.3.2.5.3.6.4 0 .1 0 .7-.2 1.3z"/></svg>
+            WhatsApp pemesan
+          </button>
+        </div>
+        <div class="panel side-card">
+          <div class="side-lbl">Deadline</div>
+          <div class="durasi-big" style="${late?'color:var(--danger)':''}">${fmtTgl(o.dl)}</div>
+          <div class="durasi-sub">${labelDl(o.dl)}</div>
+        </div>
+        <div class="panel side-card">
+          <div class="side-lbl">Durasi</div>
+          <div class="durasi-row"><span class="st">Usia pesanan</span><span class="val">${usia} hari</span></div>
+          ${o.status==='selesai'&&o.selesaiAt?`<div class="durasi-row" style="margin-top:6px"><span class="st">Selesai dalam</span><span class="val">${Math.max(0,selisih(o.dibuat)-selisih(o.selesaiAt))} hari</span></div>`:''}
+        </div>
+        <div class="panel side-card">
+          <div class="side-lbl">Aktivitas</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            ${acts.map(a=>`<div class="act-item"><span class="i-dot" style="width:6px;height:6px;border-radius:50%;background:var(--border-2);margin-top:5px;flex-shrink:0"></span>
+              <div><div class="act-teks">${esc(a.teks)}</div><div class="act-waktu">${esc(a.waktu)}</div></div></div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+/* ---------- Modal pesanan baru ---------- */
+function closeModal(){$('#modalRoot').innerHTML=''}
+function openNewOrder(){
+  $('#modalRoot').innerHTML=`<div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal-box">
+      <h3 style="font-size:16px;font-weight:600;margin-bottom:16px">Pesanan baru</h3>
+      <label class="modal-lbl">Judul pesanan</label>
+      <input id="noJudul" class="modal-inp" placeholder="mis. Banner program zakat">
+      <label class="modal-lbl">Pemesan (cabang/unit)</label>
+      <input id="noPemesan" class="modal-inp" placeholder="mis. Cabang Bogor">
+      <div class="two-col">
+        <div><label class="modal-lbl">Jenis produk</label>
+          <select id="noProduk" class="modal-inp">${PRODUK.map(p=>`<option>${p.nama}</option>`).join('')}</select></div>
+        <div><label class="modal-lbl">Prioritas</label>
+          <select id="noPrio" class="modal-inp">${PRIO.map(p=>`<option value="${p.id}" ${p.id==='sedang'?'selected':''}>${p.nama}</option>`).join('')}</select></div>
+      </div>
+      <label class="modal-lbl">Deadline</label>
+      <input id="noDl" type="date" class="modal-inp" value="${d(7)}">
+      <label class="modal-lbl">Brief</label>
+      <textarea id="noBrief" class="modal-inp" rows="4" placeholder="Jelaskan kebutuhan desainnya…"></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn-cancel" onclick="closeModal()">Batal</button>
+        <button class="btn-save" onclick="submitNewOrder()">Buat pesanan</button>
+      </div>
+    </div></div>`;
+  $('#noJudul').focus();
+}
+function submitNewOrder(){
+  const judul=$('#noJudul').value.trim();
+  if(!judul){toast('Judul pesanan wajib diisi');return}
+  const maxKode=Math.max(...ORDERS.map(o=>+o.kode.split('-')[1]));
+  ORDERS.unshift({
+    id:'o'+Date.now(),kode:'DSN-'+(maxKode+1),judul,
+    pemesan:$('#noPemesan').value.trim()||'Tidak disebutkan',
+    produk:$('#noProduk').value,prio:$('#noPrio').value,
+    dl:$('#noDl').value||d(7),status:'antrian',assignee:null,dibuat:d(0),
+    brief:$('#noBrief').value.trim()||'(Belum ada brief)',
+    comments:[],aktif:[{teks:'Pesanan dibuat',waktu:'Baru saja'}],
+  });
+  closeModal();renderContent();renderNav();
+  toast('Pesanan baru masuk ke Antrian');
+}
+
+/* ---------- Analitik ---------- */
+function setAnalTab(t){state.analTab=t;renderTabsBar();renderContent()}
+function renderTabsBar(){
+  $('#tabsBar').innerHTML=[['ringkasan','Ringkasan'],['tim','Performa tim'],['produk','Per produk']]
+    .map(([v,l])=>`<button class="tab-row ${state.analTab===v?'tab-on':''}" onclick="setAnalTab('${v}')">${l}</button>`).join('');
+}
+function kpiCard(val,lbl,onclick){
+  return `<div class="kpi-card" ${onclick?`onclick="${onclick}"`:''}>
+    <p class="kpi-val">${val}</p>
+    <div style="font-size:12px;color:var(--muted);margin-top:2px">${lbl}</div></div>`;
+}
+function colChart(vals,labels){
+  const max=Math.max(...vals,1);
+  return `<div class="colchart">${vals.map((v,i)=>`<div class="cc">
+    <span class="cc-val">${v}</span>
+    <div class="cc-bar" style="height:${Math.max(4,Math.round(v/max*130))}px;background:var(--accent)"></div>
+    <span class="cc-lbl">${labels[i]}</span></div>`).join('')}</div>`;
+}
+function hbar(items){
+  const max=Math.max(...items.map(i=>i.val),1);
+  return items.map(it=>`<div class="hbar-row" style="margin-bottom:10px">
+    <span style="width:130px;font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0">${esc(it.label)}</span>
+    <div class="hbar-track"><div style="height:100%;width:${Math.round(it.val/max*100)}%;background:${it.warna||'var(--accent)'};border-radius:var(--r-sm)"></div></div>
+    <span style="width:28px;font-size:12px;font-weight:600;text-align:right;flex-shrink:0">${it.val}</span></div>`).join('');
+}
+function insightBox(warna,soft,teks){
+  return `<div class="insight" style="background:${soft}"><span class="i-dot" style="background:${warna}"></span>
+    <div style="font-size:13px;color:var(--text-2)">${teks}</div></div>`;
+}
+function analitikHtml(){
+  const aktif=ORDERS.filter(o=>o.status!=='selesai');
+  const late=aktif.filter(o=>selisih(o.dl)<0);
+  const selesai30=ORDERS.filter(o=>o.status==='selesai'&&selisih(o.selesaiAt||o.dl)>=-30);
+  const noAssign=aktif.filter(o=>!o.assignee);
+
+  if(state.analTab==='tim'){
+    return `<div class="page-pad">
+      <div class="section-lbl">Beban kerja per anggota</div>
+      <div class="dash-2col">
+        <div class="card-panel"><div class="section-lbl">Pesanan aktif</div>
+          ${hbar(TEAM.map(u=>({label:u.nama,val:ORDERS.filter(o=>o.assignee===u.id&&o.status!=='selesai').length,warna:u.warna})))}</div>
+        <div class="card-panel"><div class="section-lbl">Pesanan selesai</div>
+          ${hbar(TEAM.map(u=>({label:u.nama,val:ORDERS.filter(o=>o.assignee===u.id&&o.status==='selesai').length,warna:u.warna})))}</div>
+      </div>
+      ${insightBox('var(--warning)','var(--warning-soft)',noAssign.length?`Ada <b>${noAssign.length} pesanan aktif tanpa assignee</b> — segera ditugaskan agar tidak menggantung.`:'Semua pesanan aktif sudah punya assignee. Bagus!')}
+    </div>`;
+  }
+  if(state.analTab==='produk'){
+    return `<div class="page-pad">
+      <div class="dash-2col">
+        <div class="card-panel"><div class="section-lbl">Pesanan aktif per produk</div>
+          ${hbar(PRODUK.map(p=>({label:p.nama,val:aktif.filter(o=>o.produk===p.nama).length,warna:p.warna})))}</div>
+        <div class="card-panel"><div class="section-lbl">Selesai per produk</div>
+          ${hbar(PRODUK.map(p=>({label:p.nama,val:ORDERS.filter(o=>o.produk===p.nama&&o.status==='selesai').length,warna:p.warna})))}</div>
+      </div>
+      ${insightBox('var(--info)','var(--info-soft)','Produk dengan antrian terbanyak sebaiknya jadi prioritas penjadwalan tim minggu ini.')}
+    </div>`;
+  }
+  // ringkasan
+  const minggu=[0,0,0,0,0,0];
+  ORDERS.forEach(o=>{const w=Math.floor(-selisih(o.dibuat)/7);if(w>=0&&w<6)minggu[w]++});
+  const vals=minggu.slice().reverse();
+  const labels=[5,4,3,2,1,0].map(w=>fmtTgl(d(-7*w-6)).slice(0,6));
+  return `<div class="page-pad">
+    <div class="kpi-grid">
+      ${kpiCard(aktif.length,'Pesanan aktif')}
+      ${kpiCard(late.length,'Terlambat — klik untuk lihat',"goKpi('late')")}
+      ${kpiCard(selesai30.length,'Selesai 30 hari terakhir')}
+      ${kpiCard(noAssign.length,'Tanpa assignee — klik untuk lihat',"goKpi('noassign')")}
+    </div>
+    <div class="dash-2col">
+      <div class="card-panel"><div class="section-lbl">Pesanan masuk 6 minggu terakhir</div>${colChart(vals,labels)}</div>
+      <div class="card-panel"><div class="section-lbl">Pesanan aktif per produk</div>
+        ${hbar(PRODUK.map(p=>({label:p.nama,val:aktif.filter(o=>o.produk===p.nama).length,warna:p.warna})))}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${late.length?insightBox('var(--danger)','var(--danger-soft)',`<b>${late.length} pesanan aktif sudah melewati deadline.</b> Klik kartu "Terlambat" di atas untuk meninjaunya.`):insightBox('var(--accent)','var(--accent-soft)','Tidak ada pesanan yang terlambat. Pertahankan!')}
+      ${noAssign.length?insightBox('var(--warning)','var(--warning-soft)',`<b>${noAssign.length} pesanan belum punya assignee.</b> Tugaskan sebelum masuk pengerjaan.`):''}
+    </div>
+  </div>`;
+}
+
+/* ---------- Kalender ---------- */
+function calGo(n){state.calOffset+=n;renderHeader();renderContent()}
+function calToday(){state.calOffset=0;renderHeader();renderContent()}
+function kalenderHtml(){
+  const base=new Date();base.setDate(1);base.setMonth(base.getMonth()+state.calOffset);
+  const y=base.getFullYear(),m=base.getMonth();
+  const start=(new Date(y,m,1).getDay()+6)%7; // Senin = kolom pertama
+  const dim=new Date(y,m+1,0).getDate();
+  const namaHari=['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+  let cells=namaHari.map(h=>`<div style="background:var(--surface-2);padding:6px 8px;font-size:11px;font-weight:600;color:var(--muted-3);text-align:center">${h}</div>`).join('');
+  for(let i=0;i<start;i++)cells+='<div style="background:var(--surface-3);min-height:86px"></div>';
+  for(let day=1;day<=dim;day++){
+    const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const due=ORDERS.filter(o=>o.dl===iso);
+    const isToday=iso===todayISO();
+    cells+=`<div style="background:var(--surface);min-height:86px;padding:6px;${isToday?'outline:2px solid var(--accent);outline-offset:-2px':''}">
+      <div style="font-size:11px;font-weight:${isToday?'700':'500'};color:${isToday?'var(--accent)':'var(--muted-3)'}">${day}</div>
+      ${due.slice(0,3).map(o=>{const st=status(o.status);return `<div class="cal-chip" style="background:${st.warna}1a;color:${st.warna}" title="${esc(o.judul)}" onclick="openDetail('${o.id}')"><span style="width:5px;height:5px;border-radius:50%;background:${st.warna};flex-shrink:0"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(o.judul)}</span></div>`}).join('')}
+      ${due.length>3?`<div style="font-size:10px;color:var(--muted-3);margin-top:2px">+${due.length-3} lainnya</div>`:''}
+    </div>`;
+  }
+  return `<div class="page-pad" style="flex:1"><div class="cal-scroll"><div class="cal-grid">${cells}</div></div>
+    <p style="font-size:12px;color:var(--muted-2);margin-top:12px">Klik chip untuk membuka detail pesanan. Warna chip mengikuti status pesanan.</p></div>`;
+}
+
+/* ---------- Arsip & aset ---------- */
+function setArsipTab(t){state.arsipTab=t;renderContent()}
+function arsipHtml(){
+  const done=ORDERS.filter(o=>o.status==='selesai').sort((a,b)=>(b.selesaiAt||b.dl).localeCompare(a.selesaiAt||a.dl));
+  let inner='';
+  if(state.arsipTab==='pesanan'){
+    inner=done.length
+      ?`<div class="card-panel" style="padding:8px 16px">${done.map(o=>`<div style="display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--surface-2)">
+          <span class="card-kode">${o.kode}</span>
+          <span class="row-title" style="flex:1;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" onclick="openDetail('${o.id}')">${esc(o.judul)}</span>
+          <span class="produk-badge" style="background:${produk(o.produk).warna}">${esc(o.produk)}</span>
+          <span style="font-size:12px;color:var(--muted);white-space:nowrap">Selesai ${fmtTgl(o.selesaiAt||o.dl)}</span>
+        </div>`).join('')}</div>`
+      :'<div class="empty-dashed">Belum ada pesanan selesai</div>';
+  }else{
+    const assets=done.flatMap(o=>[{o,nama:o.judul+' — final.png',tipe:'PNG'},{o,nama:o.judul+' — preview.jpg',tipe:'JPG'}]);
+    window._assets=assets;
+    inner=assets.length
+      ?`<div class="asset-grid">${assets.map((a,i)=>{const p=produk(a.o.produk);return `<div class="asset-card">
+          <div class="asset-thumb" style="cursor:pointer" onclick="openLightbox(${i})">
+            <span style="font-size:22px;font-weight:700;color:${p.warna}">${a.tipe}</span>
+            <span style="font-size:10px;margin-top:4px">${p.nama}</span>
+          </div>
+          <div style="padding:10px 12px">
+            <div style="font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(a.nama)}</div>
+            <div style="display:flex;align-items:center;margin-top:4px">
+              <button class="link-plain" onclick="toast('Unduhan dinonaktifkan di demo')">Unduh</button>
+              <a class="link-order" onclick="openDetail('${a.o.id}')">Lihat order →</a>
+            </div>
+          </div></div>`}).join('')}</div>`
+      :'<div class="empty-dashed">Belum ada aset</div>';
+  }
+  return `<div class="page-pad">
+    <div class="seg-tabs" style="margin-bottom:16px;display:inline-flex">${[['pesanan','Pesanan selesai'],['aset','Aset desain']].map(([v,l])=>`<button class="${state.arsipTab===v?'on':''}" onclick="setArsipTab('${v}')">${l}</button>`).join('')}</div>
+    ${inner}</div>`;
+}
+
+/* ---------- Lightbox aset ---------- */
+let lbIdx=0;
+function openLightbox(i){lbIdx=i;renderLightbox()}
+function lbNav(dir){lbIdx=(lbIdx+dir+window._assets.length)%window._assets.length;renderLightbox()}
+function renderLightbox(){
+  const a=(window._assets||[])[lbIdx];if(!a)return;
+  const p=produk(a.o.produk);
+  $('#modalRoot').innerHTML=`<div class="modal-overlay gelap" onclick="if(event.target===this)closeModal()">
+    <button class="lb-arrow" style="left:20px" onclick="lbNav(-1)">‹</button>
+    <div style="width:min(640px,80vw);aspect-ratio:4/3;border-radius:var(--r-lg);background:linear-gradient(135deg,${p.warna},${p.warna}88);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:8px">
+      <span style="font-size:40px;font-weight:700">${a.tipe}</span>
+      <span style="font-size:14px;opacity:.92;padding:0 24px;text-align:center">${esc(a.nama)}</span>
+      <span style="font-size:11px;opacity:.7">Pratinjau dinonaktifkan di demo — file asli tersimpan di sistem</span>
+    </div>
+    <button class="lb-arrow" style="right:20px" onclick="lbNav(1)">›</button>
+  </div>`;
+}
+
+/* ---------- Tim ---------- */
+function timHtml(){
+  return `<div class="page-pad">
+    <div class="section-lbl">Anggota tim (${TEAM.length})</div>
+    <div class="tim-list">${TEAM.map(u=>{
+      const aktif=ORDERS.filter(o=>o.assignee===u.id&&o.status!=='selesai').length;
+      const selesai=ORDERS.filter(o=>o.assignee===u.id&&o.status==='selesai').length;
+      return `<div class="tim-row">${avatar(u,34)}
+        <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${esc(u.nama)}</div>
+        <div style="font-size:11px;color:var(--muted-2)">${esc(u.role)}</div></div>
+        <span style="font-size:12px;color:var(--muted);white-space:nowrap">${aktif} aktif · ${selesai} selesai</span>
+        <button class="link-del" onclick="hapusAnggota('${u.id}')">Hapus</button></div>`;
+    }).join('')}</div>
+    <p style="font-size:12px;color:var(--muted-2);margin-top:12px">Di sistem asli, anggota baru ditambahkan lewat undangan email. Fitur itu dinonaktifkan di demo.</p>
+  </div>`;
+}
+function hapusAnggota(id){
+  const u=user(id);if(!u)return;
+  if(u.id==='u1'){toast('Akun demo tidak bisa dihapus');return}
+  if(!confirm(`Hapus ${u.nama} dari tim? Pesanan miliknya jadi tanpa assignee.`))return;
+  TEAM.splice(TEAM.indexOf(u),1);
+  ORDERS.forEach(o=>{if(o.assignee===id)o.assignee=null});
+  toast(`${u.nama} dihapus dari tim`);renderContent();
+}
+
+/* ---------- Notifikasi ---------- */
+function renderBell(){
+  const unread=NOTIF.filter(n=>!n.read).length;
+  const b=$('#bellBadge');
+  b.style.display=unread?'flex':'none';b.textContent=unread;
+}
+function toggleBell(){
+  const p=$('#bellPanel');
+  if(p.innerHTML){p.innerHTML='';return}
+  p.innerHTML=`<div class="bell-panel">${NOTIF.map(n=>`<button class="notif-item ${n.read?'':'unread'}" onclick="openNotif(${n.id})">
+    <div style="font-size:12.5px;color:var(--text-2);line-height:1.45">${esc(n.teks)}</div>
+    <div style="font-size:11px;color:var(--muted-2);margin-top:2px">${esc(n.waktu)}</div>
+  </button>`).join('')}</div>`;
+}
+function openNotif(id){
+  const n=NOTIF.find(x=>x.id===id);if(!n)return;
+  n.read=true;$('#bellPanel').innerHTML='';renderBell();
+  if(n.orderId&&ORDERS.find(o=>o.id===n.orderId))openDetail(n.orderId);
+}
+document.addEventListener('click',e=>{if(!e.target.closest('#bellWrap')){const p=$('#bellPanel');if(p)p.innerHTML=''}});
+
+/* ---------- Tema ---------- */
+const sunSvg='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4l1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const moonSvg='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+function themeIcon(){return document.documentElement.getAttribute('data-theme')==='dark'?sunSvg:moonSvg}
+function toggleTheme(){
+  const el=document.documentElement;
+  const next=el.getAttribute('data-theme')==='dark'?'light':'dark';
+  el.setAttribute('data-theme',next);
+  try{localStorage.setItem('theme',next)}catch(e){}
+  $('#themeBtn').innerHTML=themeIcon();
+}
+
+/* ---------- Navigasi & kerangka ---------- */
+const PAGES=[
+  {id:'board',label:'Board pesanan',badge:()=>ORDERS.filter(o=>o.status!=='selesai').length,
+   icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="11" rx="1"/><rect x="17" y="4" width="4" height="14" rx="1"/></svg>'},
+  {id:'analitik',label:'Analitik',
+   icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>'},
+  {id:'kalender',label:'Kalender',
+   icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>'},
+  {id:'arsip',label:'Arsip',
+   icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>'},
+  {id:'tim',label:'Tim',
+   icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 6a3 3 0 0 1 0 6M21 20c0-2.5-1.5-4-3.5-4.5"/></svg>'},
+];
+const HDR={
+  board:['Board pesanan','Semua permintaan desain dari seluruh cabang'],
+  analitik:['Analitik','Ringkasan performa tim & pesanan'],
+  kalender:['Kalender','Deadline pesanan per tanggal'],
+  arsip:['Arsip & aset','Pesanan selesai dan file hasil desain'],
+  tim:['Tim','Anggota tim desain'],
+};
+function renderNav(){
+  $('#sideNav').innerHTML=PAGES.map(p=>`<a class="nav-row ${state.page===p.id?'nav-on':''}" onclick="goPage('${p.id}')">
+    <span class="nav-icon">${p.icon}</span><span class="nav-label">${p.label}</span>
+    ${p.badge?`<span class="nav-badge">${p.badge()}</span>`:''}</a>`).join('');
+}
+function renderHeader(){
+  const[t,s]=HDR[state.page];
+  $('#hdrTitle').textContent=t;
+  let sub=s;
+  if(state.page==='kalender'){
+    const base=new Date();base.setDate(1);base.setMonth(base.getMonth()+state.calOffset);
+    sub=BLNF[base.getMonth()]+' '+base.getFullYear();
+  }
+  $('#hdrSub').textContent=sub;
+  $('#filterBar').style.display=state.page==='board'?'flex':'none';
+  $('#tabsBar').style.display=state.page==='analitik'?'flex':'none';
+  $('#calNav').style.display=state.page==='kalender'?'inline-flex':'none';
+}
+function goPage(p){
+  state.page=p;
+  if(detailId)closeDetail();
+  renderNav();renderHeader();renderContent();
+  window.scrollTo(0,0);
+}
+function setView(v){state.view=v;renderContent()}
+function renderContent(){
+  updateFilterUI();
+  if(state.page==='analitik')renderTabsBar();
+  const c=$('#content');
+  if(state.page==='board')c.innerHTML=state.view==='kanban'?boardHtml():tableHtml();
+  else if(state.page==='analitik')c.innerHTML=analitikHtml();
+  else if(state.page==='kalender')c.innerHTML=kalenderHtml();
+  else if(state.page==='arsip')c.innerHTML=arsipHtml();
+  else if(state.page==='tim')c.innerHTML=timHtml();
+}
+
+/* ---------- Init ---------- */
+renderNav();renderHeader();renderContent();renderBell();
+$('#themeBtn').innerHTML=themeIcon();
+$('#profileAvatar').outerHTML=avatar(TEAM[0],28);
+$('#profileBtn').addEventListener('click',()=>toast('Menu profil dinonaktifkan di demo'));
+$('#bellBtn').addEventListener('click',toggleBell);
+</script>
+</body>
+</html>

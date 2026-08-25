@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>InfakTrack — Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f0f0d;
+    --surface:#161614;
+    --line:#262622;
+    --text:#e9e7e0;
+    --muted:#8f8d84;
+    --accent:#e0b356;
+    --green:#5fae7a;
+    --red:#d97757;
+    --radius:12px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',-apple-system,sans-serif;
+    font-size:15px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  /* ── Top bar ── */
+  .topbar{
+    border-bottom:1px solid var(--line);
+    padding:14px 0;
+  }
+  .topbar .wrap{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  }
+  .backlink{
+    color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;
+    transition:color .15s;
+  }
+  .backlink:hover{color:var(--text)}
+  .demo-pill{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent);
+    border:1px solid rgba(224,179,86,.35);
+    border-radius:999px;
+    padding:5px 12px;
+    white-space:nowrap;
+  }
+
+  /* ── Header ── */
+  header{padding:56px 0 36px}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:14px;
+  }
+  h1{
+    font-family:'Instrument Serif',serif;font-weight:400;
+    font-size:clamp(34px,5vw,52px);
+    line-height:1.08;letter-spacing:-.01em;
+    margin-bottom:14px;
+  }
+  h1 em{color:var(--accent);font-style:italic}
+  .sub{color:var(--muted);max-width:560px;font-size:15px}
+  nav.appnav{
+    display:flex;gap:8px;margin-top:26px;flex-wrap:wrap;
+  }
+  nav.appnav span{
+    font-size:13px;color:var(--muted);
+    border:1px solid var(--line);border-radius:8px;
+    padding:6px 13px;background:var(--surface);
+  }
+
+  /* ── Stats ── */
+  .stats{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+    padding:8px 0 40px;
+  }
+  .stat{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 22px 20px;
+  }
+  .stat .label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:10px;
+  }
+  .stat .value{
+    font-family:'Instrument Serif',serif;
+    font-size:clamp(30px,3.6vw,42px);line-height:1;
+    letter-spacing:-.01em;
+  }
+  .stat .value em{font-style:normal;color:var(--accent)}
+  .stat .note{font-size:12.5px;color:var(--muted);margin-top:10px}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px}
+  .dot.red{background:var(--red)}
+  .dot.green{background:var(--green)}
+
+  /* ── Section titles ── */
+  .section-head{
+    display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    margin:44px 0 18px;
+  }
+  h2{
+    font-family:'Instrument Serif',serif;font-weight:400;
+    font-size:clamp(24px,3vw,30px);letter-spacing:-.01em;
+  }
+  .section-head .hint{font-size:12.5px;color:var(--muted)}
+
+  /* ── Filter chips ── */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+  .chip{
+    font-family:'Inter',sans-serif;font-size:13px;font-weight:500;
+    color:var(--muted);
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 16px;
+    cursor:pointer;
+    transition:color .15s,border-color .15s,background .15s;
+  }
+  .chip:hover{color:var(--text)}
+  .chip.active{
+    color:#0f0f0d;
+    background:var(--accent);
+    border-color:var(--accent);
+  }
+  .count-note{font-size:12.5px;color:var(--muted);margin:-12px 0 18px}
+
+  /* ── Location cards ── */
+  .cards{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:14px;
+  }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 22px;
+    transition:border-color .15s;
+  }
+  .card:hover{border-color:#36362f}
+  .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px}
+  .card h3{font-size:16px;font-weight:600;letter-spacing:-.005em}
+  .card .district{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+  .badge{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    border-radius:6px;padding:4px 9px;white-space:nowrap;
+  }
+  .badge.type{color:var(--muted);border:1px solid var(--line);background:var(--bg)}
+  .badge.status{display:inline-flex;align-items:center;gap:6px}
+  .badge.status::before{content:"";width:6px;height:6px;border-radius:50%}
+  .badge.status.aktif{color:var(--green);border:1px solid rgba(95,174,122,.35)}
+  .badge.status.aktif::before{background:var(--green)}
+  .badge.status.terlambat{color:var(--red);border:1px solid rgba(217,119,87,.35)}
+  .badge.status.terlambat::before{background:var(--red)}
+  .card-meta{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    border-top:1px solid var(--line);padding-top:14px;
+  }
+  .card-meta .pulled{font-size:12.5px;color:var(--muted)}
+  .card-meta .nominal{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--text);
+  }
+  .card-status-row{margin-bottom:12px}
+  .empty-state{
+    display:none;
+    border:1px dashed var(--line);border-radius:var(--radius);
+    padding:36px;text-align:center;color:var(--muted);font-size:14px;
+  }
+
+  /* ── Table ── */
+  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+  table{width:100%;border-collapse:collapse;min-width:560px}
+  th{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);font-weight:500;
+    text-align:left;padding:14px 20px;
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  th:last-child,td:last-child{text-align:right}
+  td{padding:13px 20px;border-bottom:1px solid var(--line);font-size:14px;white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  td .loc{font-weight:500}
+  td .init{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;
+    border:1px solid var(--line);border-radius:6px;
+    padding:3px 8px;color:var(--muted);background:var(--bg);
+  }
+  td.nom{font-family:'IBM Plex Mono',monospace;font-size:13px}
+
+  /* ── Production note + footer ── */
+  .prod-note{
+    margin:44px 0 0;
+    border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:var(--radius);
+    background:var(--surface);
+    padding:18px 22px;
+    font-size:14px;color:var(--muted);
+    max-width:720px;
+  }
+  .prod-note strong{color:var(--text);font-weight:600}
+  footer{
+    margin-top:64px;
+    border-top:1px solid var(--line);
+    padding:22px 0 40px;
+  }
+  footer p{font-size:12.5px;color:var(--muted)}
+
+  /* ── Mobile ── */
+  @media (max-width:640px){
+    .wrap{padding:0 18px}
+    header{padding:40px 0 28px}
+    .stats{grid-template-columns:1fr;gap:10px}
+    .cards{grid-template-columns:1fr}
+    .stat{padding:18px 20px 16px}
+    .card{padding:18px}
+    .topbar .demo-pill{font-size:9.5px;padding:4px 10px}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="backlink" href="../index.html">← Portfolio Ridwan Yahya</a>
+    <span class="demo-pill">DEMO — data contoh, bukan data klien</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Manajemen Kotak Infak · Aplikasi Lapangan</div>
+    <h1>Infak<em>Track</em></h1>
+    <p class="sub">Aplikasi mobile-first untuk petugas lapangan: memantau lokasi kotak infak, mencatat penarikan, dan melaporkan hasil — semua dari HP.</p>
+    <nav class="appnav">
+      <span>Lokasi</span><span>Penarikan</span><span>Laporan</span>
+    </nav>
+  </header>
+
+  <section class="stats">
+    <div class="stat">
+      <div class="label">Kotak aktif</div>
+      <div class="value">128</div>
+      <div class="note">Tersebar di 4 kecamatan</div>
+    </div>
+    <div class="stat">
+      <div class="label">Terkumpul bulan ini</div>
+      <div class="value"><em>Rp</em> 14,6 jt</div>
+      <div class="note">Dari 63 penarikan tercatat</div>
+    </div>
+    <div class="stat">
+      <div class="label">Perlu perhatian</div>
+      <div class="value">7</div>
+      <div class="note"><span class="dot red"></span>Kotak terlambat ditarik (&gt; 30 hari)</div>
+    </div>
+  </section>
+
+  <div class="section-head">
+    <h2>Lokasi kotak</h2>
+    <span class="hint">Klik filter untuk menyaring daftar</span>
+  </div>
+
+  <div class="chips" id="chips">
+    <button class="chip active" data-filter="semua">Semua</button>
+    <button class="chip" data-filter="aktif">Aktif</button>
+    <button class="chip" data-filter="terlambat">Terlambat</button>
+  </div>
+  <div class="count-note" id="countNote"></div>
+
+  <div class="cards" id="cards"></div>
+  <div class="empty-state" id="emptyState">Tidak ada lokasi pada filter ini.</div>
+
+  <div class="section-head">
+    <h2>Penarikan terbaru</h2>
+    <span class="hint">5 transaksi terakhir</span>
+  </div>
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Tanggal</th><th>Lokasi</th><th>Petugas</th><th>Nominal</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>14 Agu 2026</td><td><span class="loc">Masjid Al-Ikhlas</span></td><td><span class="init">FA</span></td><td class="nom">Rp 1.240.000</td></tr>
+        <tr><td>12 Agu 2026</td><td><span class="loc">Minimarket Barokah</span></td><td><span class="init">RS</span></td><td class="nom">Rp 865.000</td></tr>
+        <tr><td>10 Agu 2026</td><td><span class="loc">Toko Sinar Jaya</span></td><td><span class="init">FA</span></td><td class="nom">Rp 530.000</td></tr>
+        <tr><td>8 Agu 2026</td><td><span class="loc">Masjid At-Taqwa</span></td><td><span class="init">DP</span></td><td class="nom">Rp 1.975.000</td></tr>
+        <tr><td>5 Agu 2026</td><td><span class="loc">Warung Berkah</span></td><td><span class="init">RS</span></td><td class="nom">Rp 410.000</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="prod-note">
+    <strong>Di production:</strong> login per wilayah, peta lokasi, pencatatan penarikan langsung dari HP petugas, dan export laporan ke Excel/PDF.
+  </div>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Demo statis dengan data contoh · Sistem aslinya live dan dipakai klien di production</p>
+  </div>
+</footer>
+
+<script>
+const lokasi = [
+  { nama:"Masjid Al-Ikhlas",    tipe:"Masjid",   kec:"Kecamatan A", hari:2,  nominal:"Rp 1.240.000" },
+  { nama:"Warung Berkah",       tipe:"Warung",   kec:"Kecamatan B", hari:9,  nominal:"Rp 410.000" },
+  { nama:"Toko Sinar Jaya",     tipe:"Toko",     kec:"Kecamatan C", hari:6,  nominal:"Rp 530.000" },
+  { nama:"Musholla An-Nur",     tipe:"Musholla", kec:"Kecamatan A", hari:41, nominal:"Rp 285.000" },
+  { nama:"Kantor CV Maju",      tipe:"Kantor",   kec:"Kecamatan D", hari:14, nominal:"Rp 620.000" },
+  { nama:"Sekolah Harapan",     tipe:"Sekolah",  kec:"Kecamatan B", hari:47, nominal:"Rp 350.000" },
+  { nama:"Minimarket Barokah",  tipe:"Toko",     kec:"Kecamatan C", hari:4,  nominal:"Rp 865.000" },
+  { nama:"Masjid At-Taqwa",     tipe:"Masjid",   kec:"Kecamatan D", hari:33, nominal:"Rp 1.975.000" },
+];
+
+const cardsEl = document.getElementById('cards');
+const emptyEl = document.getElementById('emptyState');
+const countEl = document.getElementById('countNote');
+const chipsEl = document.getElementById('chips');
+
+function render(filter){
+  const shown = lokasi.filter(l => {
+    if (filter === 'aktif') return l.hari <= 30;
+    if (filter === 'terlambat') return l.hari > 30;
+    return true;
+  });
+
+  cardsEl.innerHTML = shown.map(l => {
+    const telat = l.hari > 30;
+    return `
+    <div class="card">
+      <div class="card-top">
+        <div>
+          <h3>${l.nama}</h3>
+          <div class="district">${l.kec}</div>
+        </div>
+        <span class="badge type">${l.tipe}</span>
+      </div>
+      <div class="card-status-row">
+        <span class="badge status ${telat ? 'terlambat' : 'aktif'}">${telat ? 'Terlambat' : 'Aktif'}</span>
+      </div>
+      <div class="card-meta">
+        <span class="pulled">Terakhir ditarik: ${l.hari} hari lalu</span>
+        <span class="nominal">${l.nominal}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  emptyEl.style.display = shown.length ? 'none' : 'block';
+  countEl.textContent = `Menampilkan ${shown.length} dari ${lokasi.length} lokasi`;
+}
+
+chipsEl.addEventListener('click', e => {
+  const btn = e.target.closest('.chip');
+  if (!btn) return;
+  chipsEl.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  render(btn.dataset.filter);
+});
+
+render('semua');
+</script>
+
+</body>
+</html>
