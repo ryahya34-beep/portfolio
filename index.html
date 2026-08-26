@@ -157,7 +157,7 @@
     max-height:0;overflow:hidden;
     transition:max-height .35s ease;
   }
-  .project.open .p-detail{max-height:600px}
+  .project.open .p-detail{max-height:800px}
   .p-detail-inner{
     display:grid;grid-template-columns:3.2rem 1fr;gap:1.2rem;
     padding:0 .4rem 1.8rem;
@@ -185,6 +185,23 @@
   .p-link-soon::before{
     content:"";width:6px;height:6px;border-radius:50%;background:var(--muted);
   }
+  .p-cred{
+    margin-top:1rem;padding:.7rem .9rem;
+    background:var(--surface);border:1px solid var(--line);
+    border-left:2px solid var(--accent);border-radius:8px;
+    font-size:.78rem;color:var(--muted);
+    display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .7rem;
+  }
+  .p-cred-label{
+    font-family:'IBM Plex Mono',monospace;font-size:.68rem;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--accent);
+  }
+  .p-cred code{
+    font-family:'IBM Plex Mono',monospace;color:var(--text);
+    background:var(--accent-dim);padding:.2rem .55rem;border-radius:4px;
+    font-size:.78rem;user-select:all;
+  }
+  .p-cred-sep{color:var(--line)}
 
   /* ---------- PRINSIP ---------- */
   .prinsip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
@@ -287,6 +304,12 @@
       <p>Setiap aksi penting tercatat lewat audit trail di level database, jadi riwayat
       tidak bisa dipalsukan atau dihapus diam-diam.</p>
       <span class="p-metric">±2.000 order/tahun · multi-cabang nasional</span>
+      <div class="p-cred">
+        <span class="p-cred-label">Login demo</span>
+        <code>demo@ridwamovic.uk</code>
+        <span class="p-cred-sep">·</span>
+        <code>ginhez-Danxed-vabwe6</code>
+      </div>
       <div class="p-meta">
         <span class="stack">Next.js · Supabase · Tailwind · Realtime</span>
         <a class="p-link" href="https://desain-bmh-git-sandbox-ryahya34-beeps-projects.vercel.app" target="_blank" rel="noopener">Lihat demo →</a>
